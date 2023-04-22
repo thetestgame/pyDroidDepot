@@ -12,13 +12,16 @@ from bleak import BleakError
 import asyncio
 
 async def main() -> None:
+    """
+    Main entry point into the example application
+    """
 
     d = await discover_droid(retry=True)
-    
+    await d.audio_controller.set_volume(20)
+
     try:
         await d.connect()
         while d.droid.is_connected:
-            await d.audio_controller.set_volume(20)
             await d.script_engine.execute_script(randrange(1, 7))
             sleep(2)
             await d.motor_controller.center_head()
@@ -32,8 +35,9 @@ async def main() -> None:
     except KeyboardInterrupt as err:
         pass
     finally:
-        print("\nShutting down.")
+        print("Shutting down.")
         await d.disconnect(silent=True)
 
+# Main entry point into the example application
 if __name__ == "__main__":
     asyncio.run(main())

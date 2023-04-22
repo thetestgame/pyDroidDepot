@@ -1,7 +1,19 @@
 """
+DroidConnection is a class that represents a connection to a SWGE DroidDepot droid using BLE protocol. 
+It provides methods for connecting and disconnecting to the droid, sending commands to it, and executing scripts. 
+The class also contains instances of DroidAudioController, DroidMotorController, and DroidScriptEngine, 
+which are used to control the droid's audio, motor, and script functions, respectively.
+
+The DroidConnection class takes one argument, profile, which is a string representing the UUID of the BLE profile to connect to. 
+After connecting to the droid using the connect method, the send_droid_command method can be used to send commands to the droid, 
+and the execute_script method can be used to execute pre-defined scripts on the droid. 
+The disconnect method can be used to disconnect from the droid.
+
+This class is licensed under the MIT License.
 """
 
 import asyncio
+import logging
 from time import sleep
 from threading import Thread
 from bleak import BleakScanner, BleakClient, BleakError
@@ -12,6 +24,10 @@ from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
 
 class DroidConnection(object):
     """
+    Represents a connection to a SWGE DroidDepot droid.
+
+    Args:
+        profile (str): A string representing the UUID of the BLE profile to connect to.
     """
 
     def __init__(self, profile):
@@ -58,6 +74,7 @@ class DroidConnection(object):
 
     def __start_heartbeat_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         """
+        Starts the heartbeat event loop
         """
 
         asyncio.set_event_loop(loop)
@@ -65,6 +82,8 @@ class DroidConnection(object):
 
     async def __send_heartbeat_command(self) -> None:
         """
+        Sends our flash pairing led command to the droid. This command is used as both a connection status indicator as well
+        as keeps our connection alive.
         """
 
         while self.droid.is_connected:
@@ -77,8 +96,6 @@ class DroidConnection(object):
         """
 
         try:
-            await self.audio_controller.shutdown()
-
             if not silent:
                 sound_bank = bytearray.fromhex("27420f4444001f09")
                 await self.droid.write_gatt_char(0x000d, sound_bank)
@@ -93,6 +110,21 @@ class DroidConnection(object):
 
     def build_droid_command(self, command_id: int, data: str) -> bytearray:
         """
+        The build_droid_command function creates a bytearray that represents a command for a Droid. 
+        It takes in a command_id (integer) and a data string, and returns the corresponding bytearray.
+
+        The first byte of the bytearray represents the total length of the command in bytes. The second byte is 0x42 
+        if the command id is 15, or 0x00 otherwise. The third byte is the command id itself. The fourth byte is the length 
+        of the data string in bytes, plus 0x40. The remaining bytes are the data string itself, represented in hexadecimal format.
+
+        If the data string is malformed, a ValueError is raised.
+
+        Args:
+            command_id (int): The command id to be included in the Droid command
+            data (str): The data string to be included in the Droid command
+
+        Returns:
+            bytearray: The bytearray representation of the Droid command, with the given command id and data string.
         """
 
         data_length = len(data) // 2
@@ -118,6 +150,13 @@ class DroidConnection(object):
 
     async def send_droid_command(self, command_id: int, data: str = "") -> None:
         """
+        Sends a command to the Droid, composed of a command ID and optional data.
+
+        If the data string is malformed, a ValueError is raised.
+
+        Args:
+            command_id (int): The ID of the command to send.
+            data (str): Optional data to include in the command, as a string of hexadecimal digits.
         """
 
         command = self.build_droid_command(command_id, data)
@@ -125,6 +164,13 @@ class DroidConnection(object):
 
     async def send_droid_multi_command(self, command_id: int, data: str = "") -> None:
         """
+        Sends a multi command to the Droid, composed of a command ID and optional data.
+
+        If the data string is malformed, a ValueError is raised.
+
+        Args:
+            command_id (int): The ID of the command to send.
+            data (str): Optional data to include in the command, as a string of hexadecimal digits.
         """
 
         command = "44%s%s" % ("{:02d}".format(command_id), data)
@@ -142,10 +188,7 @@ def find_droid(candidate: object, data: object) -> bool:
         True if the candidate device name is "DROID", otherwise False
     """
 
-    if candidate.name == "DROID":
-        return True
-    else:
-        return False
+    return True if candidate.name == "DROID" else False
 
 async def discover_droid(retry: bool = False) -> DroidConnection:
     """
@@ -161,22 +204,21 @@ async def discover_droid(retry: bool = False) -> DroidConnection:
     """
 
     discovered_droid = None
-
     while retry and discovered_droid is None:
         try:
             discovered_droid = await BleakScanner.find_device_by_filter(find_droid)
             if discovered_droid is None:
                 if not retry:
-                    print("Droid discovery timed out.")
+                    logging.error("Droid discovery timed out.")
                     return
                 else:
-                    print("Droid discovery timed out. Retrying...")
+                    logging.warning("Droid discovery timed out. Retrying...")
                     continue
         except BleakError as err:
-            print("Droid discovery failed. Retrying...")
+            logging.warning("Droid discovery failed. Retrying...")
             continue
 
 
-    print (f"Astromech successfully discovered: [ {discovered_droid} ]")
+    logging.info(f"Droid successfully discovered: [ {discovered_droid} ]")
     d = DroidConnection(discovered_droid)
     return d

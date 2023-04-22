@@ -12,9 +12,11 @@ from bleak import BleakError
 import asyncio
 
 async def main() -> None:
+    """
+    Main entry point into the example application
+    """
 
     d = await discover_droid(retry=True)
-    
     try:
         await d.connect()
 
@@ -34,8 +36,9 @@ async def main() -> None:
     except KeyboardInterrupt as err:
         pass
     finally:
-        print("\nShutting down.")
+        print("Shutting down.")
         await d.disconnect(silent=True)
 
+# Main entry point into the example application
 if __name__ == "__main__":
     asyncio.run(main())
