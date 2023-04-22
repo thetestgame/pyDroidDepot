@@ -32,5 +32,4 @@ def hex_to_int(hex_str: str) -> int:
         int: The integer representation of the hexadecimal string.
     """
     
-    
     return int(hex_str, 16)

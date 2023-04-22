@@ -16,9 +16,6 @@ def cast_argument(argument, arg_type):
         return arg_type(argument)
 
 async def execute_service_command(service_component: object, func_name: str, arguments: list) -> None:
-    """
-    """
-
     if not hasattr(service_component, func_name):
         raise ValueError("Function name (%s) not found" % func_name)
 
@@ -41,21 +38,13 @@ async def execute_service_command(service_component: object, func_name: str, arg
         func_inst(*args)
 
 def get_service_command_args(input_list: list) -> list:
-    """
-    """ 
-
     if len(input_list) > 2:
         return input_list[2:]
     else:
         return []
 
 async def main() -> None:
-
-    try:
-        d = await discover_droid(retry=True)
-    except:
-        raise
-    
+    d = await discover_droid(retry=True)
     head_leds = [DroidLedIdentifier.RUnitLeftHeadLed, DroidLedIdentifier.RUnitMiddleHeadLed, DroidLedIdentifier.RUnitRightHeadLed]
     try:
         await d.connect()
