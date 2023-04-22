@@ -83,14 +83,14 @@ class DroidPersonalityIdentifier(object):
         DroidAudioBankIdentifier.DroidDepotAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 4, Black: 6, Red2: 5, CB23: 5, C110P: 13, Yellow: 5, DarkBlue: 4, BUnit: 6, RUnit: 4, BBUnit: 3 },
         DroidAudioBankIdentifier.ResistenceAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 5, Black: 5, Red2: 5, CB23: 5, C110P: 5,  Yellow: 5, DarkBlue: 4, BUnit: 6, RUnit: 3, BBUnit: 3 },
         DroidAudioBankIdentifier.UnknownAudioBank:              { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.OgasCantinaAudioBank:          { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.DokOndarsAudioBank:            { Blue: 5, Gray: 3, Red: 3, Orange: 3, Purple: 4, Black: 5, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 4, BUnit: 5, RUnit: 4, BBUnit: 5 },
-	    DroidAudioBankIdentifier.FirstOrderAudioBank:           { Blue: 3, Gray: 5, Red: 3, Orange: 3, Purple: 5, Black: 3, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 5, BUnit: 5, RUnit: 5, BBUnit: 5 },
-	    DroidAudioBankIdentifier.InitialActivationAudioBank:    { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.MotorSoundAudioBank:           { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 0, RUnit: 1, BBUnit: 0 },
-	    DroidAudioBankIdentifier.EmptyAudioBank:                { Blue: 0, Gray: 0, Red: 0, Orange: 0, Purple: 0, Black: 0, Red2: 0, CB23: 0, C110P: 0,  Yellow: 0, DarkBlue: 0, BUnit: 0, RUnit: 0, BBUnit: 0 },
-	    DroidAudioBankIdentifier.BlasterAcessoryAudioBank:      { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BUnit: 0, RUnit: 2, BBUnit: 0 },
-	    DroidAudioBankIdentifier.ThrusterAccessoryAudioBank:    { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BUnit: 0, RUnit: 2, BBUnit: 0 }
+        DroidAudioBankIdentifier.OgasCantinaAudioBank:          { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
+        DroidAudioBankIdentifier.DokOndarsAudioBank:            { Blue: 5, Gray: 3, Red: 3, Orange: 3, Purple: 4, Black: 5, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 4, BUnit: 5, RUnit: 4, BBUnit: 5 },
+        DroidAudioBankIdentifier.FirstOrderAudioBank:           { Blue: 3, Gray: 5, Red: 3, Orange: 3, Purple: 5, Black: 3, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 5, BUnit: 5, RUnit: 5, BBUnit: 5 },
+        DroidAudioBankIdentifier.InitialActivationAudioBank:    { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
+        DroidAudioBankIdentifier.MotorSoundAudioBank:           { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 0, RUnit: 1, BBUnit: 0 },
+        DroidAudioBankIdentifier.EmptyAudioBank:                { Blue: 0, Gray: 0, Red: 0, Orange: 0, Purple: 0, Black: 0, Red2: 0, CB23: 0, C110P: 0,  Yellow: 0, DarkBlue: 0, BUnit: 0, RUnit: 0, BBUnit: 0 },
+        DroidAudioBankIdentifier.BlasterAcessoryAudioBank:      { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BUnit: 0, RUnit: 2, BBUnit: 0 },
+        DroidAudioBankIdentifier.ThrusterAccessoryAudioBank:    { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BUnit: 0, RUnit: 2, BBUnit: 0 }
     }
 
     ChipAffiliation = {
