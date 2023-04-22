@@ -8,7 +8,8 @@ This code is MIT licensed.
 """
 
 from droid.utils import  int_to_hex
-from droid.protocol import DroidMultipurposeCommand
+from droid.protocol import DroidMultipurposeCommand, DroidAffiliation
+from droid.hardware import DroidLedIdentifier, get_shutdown_audio_track
 
 class DroidAudioCommand(object):
     """
@@ -54,135 +55,6 @@ class DroidAudioCommand(object):
     DisableHeadLeds = 74
     EnableHeadLeds = 75
 
-class DroidAudioBankIdentifier(object):
-    """
-    A collection of identifiers used to represent available audio banks of a droid or its connected personality chip. 
-    These are used in audio playback.
-    """
-
-    GeneralUseAudioBank = 1
-    DroidDepotAudioBank = 2
-    ResistenceAudioBank = 3
-    UnknownAudioBank = 4
-    OgasCantinaAudioBank = 5
-    DokOndarsAudioBank = 6
-    FirstOrderAudioBank = 7
-    InitialActivationAudioBank = 8
-    MotorSoundAudioBank = 9
-    EmptyAudioBank = 10
-    BlasterAcessoryAudioBank = 11
-    ThrusterAccessoryAudioBank = 12
-
-class DroidAudioChipIdentifier(object):
-    """
-    A collection of identifiers used to represent various types of personality chips for audio 
-    lookup as well as droids for their built-in programmed audio.
-
-    Attributes:
-        Blue (int): Identifier for the blue personality chip.
-        Gray (int): Identifier for the gray personality chip.
-        Red (int): Identifier for the red personality chip.
-        Orange (int): Identifier for the orange personality chip.
-        Purple (int): Identifier for the purple personality chip.
-        Black (int): Identifier for the black personality chip.
-        Red2 (int): Identifier for the Red 2 personality chip. Same value as CB23.
-        Yellow (int): Identifier for the yellow personality chip.
-        DarkBlue (int): Identifier for the dark blue personality chip.
-
-        C110P (int): Identifier for the C1-10P droid.
-        CB23 (int): Identifier for the CB-23 droid.
-        BdUnit (int): Identifier for the BD unit droid.
-        RUnit (int): Identifier for the R unit droid.
-        BBUnit (int): Identifier for the BB unit droid.
-
-        ChipAudioCount (dict): Dictionary containing a total count of available audio by audio bank id and by droid/personality chip
-    """
-
-    # Personality Chips
-    Blue = 1
-    Gray = 2
-    Red = 3
-    Orange = 4
-    Purple = 5
-    Black = 6
-    Red2 = 7
-    Yellow = 9
-    DarkBlue = 10
-
-    # Droids
-    CB23 = 7
-    C110P = 8
-    BdUnit = 11
-    RUnit = 12
-    BBUnit = 13  
-
-    ChipAudioCount = {
-        DroidAudioBankIdentifier.GeneralUseAudioBank:           { Blue: 5, Gray: 4, Red: 5, Orange: 5, Purple: 4, Black: 3, Red2: 5, CB23: 5, C110P: 6,  Yellow: 4, DarkBlue: 4, BdUnit: 5, RUnit: 4, BBUnit: 5 },
-        DroidAudioBankIdentifier.DroidDepotAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 4, Black: 6, Red2: 5, CB23: 5, C110P: 13, Yellow: 5, DarkBlue: 4, BdUnit: 6, RUnit: 4, BBUnit: 3 },
-        DroidAudioBankIdentifier.ResistenceAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 5, Black: 5, Red2: 5, CB23: 5, C110P: 5,  Yellow: 5, DarkBlue: 4, BdUnit: 6, RUnit: 3, BBUnit: 3 },
-        DroidAudioBankIdentifier.UnknownAudioBank:              { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BdUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.OgasCantinaAudioBank:          { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BdUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.DokOndarsAudioBank:            { Blue: 5, Gray: 3, Red: 3, Orange: 3, Purple: 4, Black: 5, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 4, BdUnit: 5, RUnit: 4, BBUnit: 5 },
-	    DroidAudioBankIdentifier.FirstOrderAudioBank:           { Blue: 3, Gray: 5, Red: 3, Orange: 3, Purple: 5, Black: 3, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 5, BdUnit: 5, RUnit: 5, BBUnit: 5 },
-	    DroidAudioBankIdentifier.InitialActivationAudioBank:    { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BdUnit: 1, RUnit: 1, BBUnit: 1 },
-	    DroidAudioBankIdentifier.MotorSoundAudioBank:           { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BdUnit: 0, RUnit: 1, BBUnit: 0 },
-	    DroidAudioBankIdentifier.EmptyAudioBank:                { Blue: 0, Gray: 0, Red: 0, Orange: 0, Purple: 0, Black: 0, Red2: 0, CB23: 0, C110P: 0,  Yellow: 0, DarkBlue: 0, BdUnit: 0, RUnit: 0, BBUnit: 0 },
-	    DroidAudioBankIdentifier.BlasterAcessoryAudioBank:      { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BdUnit: 0, RUnit: 2, BBUnit: 0 },
-	    DroidAudioBankIdentifier.ThrusterAccessoryAudioBank:    { Blue: 2, Gray: 2, Red: 2, Orange: 2, Purple: 2, Black: 2, Red2: 2, CB23: 2, C110P: 2,  Yellow: 2, DarkBlue: 2, BdUnit: 0, RUnit: 2, BBUnit: 0 }
-    }
-
-class DroidLedIdentifier(object):
-    """
-    A collection of LED identifiers for a droid.
-
-    Attributes:
-        RUnitLeftHeadLed (int): Identifier for the left head LED on an R unit.
-        RUnitMiddleHeadLed (int): Identifier for the middle head LED on an R unit.
-        RUnitRightHeadLed (int): Identifier for the right head LED on an R unit.
-        RUnitLeftAccessoryLed (int): Identifier for the left accessory LED on an R unit.
-        RUnitRightAcessoryLed (int): Identifier for the right accessory LED on an R unit.
-        BUnitHeadLeds (int): Identifier for the head LEDs on a BB unit.
-        BDUnitLed0Green (int): Identifier for LED 0 green on a BD unit.
-        BDUnitLED0Green (int): Identifier for LED 0 green on a BD unit.
-        BDUnitLED0Red (int): Identifier for LED 0 red on a BD unit.
-        BDUnitLED1Blue (int): Identifier for LED 1 blue on a BD unit.
-        BDUnitLED1Green (int): Identifier for LED 1 green on a BD unit.
-        BDUnitLED1Red (int): Identifier for LED 1 red on a BD unit.
-        BDUnitLED2Blue (int): Identifier for LED 2 blue on a BD unit.
-        BDUnitLED2Green (int): Identifier for LED 2 green on a BD unit.
-        BDUnitLED2Red (int): Identifier for LED 2 red on a BD unit.
-        BDUnitLED3Blue (int): Identifier for LED 3 blue on a BD unit.
-        BDUnitLED3Green (int): Identifier for LED 3 green on a BD unit.
-        BDUnitLED3Blue (int): Identifier for LED 3 blue on a BD unit.
-        BDUnitLeftEyeLed (int): Identifier for the left eye LED on a BD unit.
-        BDUnitRightEyeLed (int): Identifier for the right eye LED on a BD unit.
-    """
-
-    # R and C units
-    RUnitLeftHeadLed = 1
-    RUnitMiddleHeadLed = 2
-    RUnitRightHeadLed = 4
-    RUnitLeftAccessoryLed = 8
-    RUnitRightAcessoryLed = 16
-
-    # BB Units
-    BUnitHeadLeds = 1
-
-    # BD Units
-    BDUnitLed0Green = 0
-    BDUnitLED0Green = 1
-    BDUnitLED0Red = 2
-    BDUnitLED1Blue = 3
-    BDUnitLED1Green = 4
-    BDUnitLED1Red = 5
-    BDUnitLED2Blue = 6
-    BDUnitLED2Green = 7
-    BDUnitLED2Red = 8
-    BDUnitLED3Blue = 9
-    BDUnitLED3Green = 10
-    BDUnitLED3Blue = 11
-    BDUnitLeftEyeLed = 12
-    BDUnitRightEyeLed = 13
 
 class DroidAudioController(object):
     """
@@ -221,22 +93,6 @@ class DroidAudioController(object):
         command_data = "%s%s"  % (command_id, data)
         await self.droid.send_droid_multi_command(DroidMultipurposeCommand.AudioControllerCommand, command_data)
 
-    def get_available_audio_in_bank(self, bank_id: int, personality_id: int) -> int:
-        """
-        Returns the amount of audio clips that are available to play in a given audio bank depending on the droid/personality chip
-
-        Args:
-
-        Returns:
-            an integer representing the total number of available audio clips
-        """
-
-        if bank_id not in DroidAudioChipIdentifier.ChipAudioCount:
-            return 0
-        
-        bank_info = DroidAudioChipIdentifier.ChipAudioCount[personality_id]
-        return 0 if personality_id not in bank_info else bank_info[personality_id]
-
     async def play_audio(self, sound_id: int = None, bank_id: int = None, cycle: bool = False, volume: int = None) -> None:
         """
         Plays audio on the Droid.
@@ -254,11 +110,12 @@ class DroidAudioController(object):
         if volume:
             await self.set_volume(volume)
 
+        bank_id = bank_id - 1 if bank_id != None else 0
         if bank_id and (not hasattr(self, "sound_bank") or self.sound_bank != bank_id):
             await self.set_audio_bank(bank_id)
 
-        sound_id = int_to_hex(sound_id if sound_id != None else 0)
-        bank_id = int_to_hex(bank_id if bank_id != None else 0)
+        sound_id = int_to_hex(sound_id - 1 if sound_id != None else 0)
+        bank_id = int_to_hex(bank_id)
 
         audio_command = "00"
         audio_parameter = "00"
@@ -273,6 +130,14 @@ class DroidAudioController(object):
             audio_parameter = bank_id
         
         await self.execute_audio_command(audio_command, audio_parameter)
+
+    async def play_shutdown_audio(self) -> None:
+        """
+        Plays the droid's shutdown audio based on its configured personality id
+        """
+
+        bank_id, sound_id = get_shutdown_audio_track(self.droid.personality_id)
+        await self.play_audio(sound_id=sound_id, bank_id=bank_id, cycle=True)
 
     async def set_audio_bank(self, bank_id: int) -> None:
         """

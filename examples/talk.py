@@ -17,10 +17,10 @@ async def main() -> None:
     """
 
     d = await discover_droid(retry=True)
-    await d.audio_controller.set_volume(20)
-
     try:
         await d.connect()
+        await d.audio_controller.set_volume(20)
+        
         while d.droid.is_connected:
             await d.script_engine.execute_script(randrange(1, 7))
             sleep(2)
@@ -36,7 +36,7 @@ async def main() -> None:
         pass
     finally:
         print("Shutting down.")
-        await d.disconnect(silent=True)
+        await d.disconnect()
 
 # Main entry point into the example application
 if __name__ == "__main__":

@@ -16,11 +16,12 @@ import asyncio
 import logging
 from time import sleep
 from threading import Thread
-from bleak import BleakScanner, BleakClient, BleakError
+from bleak import BleakScanner, BleakClient, BleakError, AdvertisementData
 from droid.protocol import *
 from droid.audio import DroidAudioController
 from droid.motor import DroidMotorController
 from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
+from droid.hardware import DisneyManufacturerId, DroidPersonalityIdentifier, DroidAffiliation
 
 class DroidConnection(object):
     """
@@ -30,16 +31,21 @@ class DroidConnection(object):
         profile (str): A string representing the UUID of the BLE profile to connect to.
     """
 
-    def __init__(self, profile: str):
+    def __init__(self, profile: str, manufacturer_data):
         """
         Initializes a new instance of the Droid class.
 
         Args:
             profile (str): A string representing the UUID of the BLE profile to connect to.
+            manufacturer_data (dict): a Dictionary containing the manufacturer data of the droid being connected.
         """
+        
         
         self.profile = profile
         self.droid = None
+        self.manufacturer_data = manufacturer_data
+        self.personality_id = DroidPersonalityIdentifier.RUnit
+        self.affilliation_id = DroidAffiliation.Scoundrel
 
         self.audio_controller = DroidAudioController(self)
         self.script_engine = DroidScriptEngine(self)
@@ -56,6 +62,7 @@ class DroidConnection(object):
         timeout = 0.0
         self.droid = BleakClient(self.profile)
         await self.droid.connect()
+
         while not self.droid.is_connected and timeout < 10:
             sleep (.1)
             timeout += .1
@@ -63,6 +70,11 @@ class DroidConnection(object):
         connect_code = bytearray.fromhex("222001")
         await self.droid.write_gatt_char(0x000d, connect_code, False)
         await self.droid.write_gatt_char(0x000d, connect_code, False)
+
+        droid_data = self.manufacturer_data[DisneyManufacturerId]
+        droid_data_len = len(droid_data)
+        self.personality_id = droid_data[droid_data_len - 1]
+        self.affilliation_id = (droid_data[droid_data_len - 2] - 0x80) / 2
         
         if not silent:
             await self.script_engine.execute_script(DroidScripts.DroidPairingSequence1)
@@ -95,12 +107,10 @@ class DroidConnection(object):
         Disconnect from the Droid.
         """
 
+        logging.info("Disconnecting from droid")
         try:
             if not silent:
-                sound_bank = bytearray.fromhex("27420f4444001f09")
-                await self.droid.write_gatt_char(0x000d, sound_bank)
-                sound_selection = bytearray.fromhex("27420f4444001800")
-                await self.droid.write_gatt_char(0x000d, sound_selection)
+                await self.audio_controller.play_shutdown_audio()
                 sleep(3)
         finally:
             await self.droid.disconnect()
@@ -176,19 +186,19 @@ class DroidConnection(object):
         command = "44%s%s" % ("{:02d}".format(command_id), data)
         await self.send_droid_command(DroidCommand.MultipurposeCommand, command)
 
-def find_droid(candidate: object, data: object) -> bool:
+def find_droid(device: object, advertising_data: AdvertisementData) -> bool:
     """
     Returns True if the candidate device name is "DROID", otherwise returns False.
 
     Args:
-        candidate (Bleak Device): the Bluetooth device being scanned
-        data (object): additional data collected during the scan (not used in this function)
+        device (Bleak Device): the Bluetooth device being scanned
+        advertising_data (Advertisement Data): additional data collected during the scan
     
     Returns:
         True if the candidate device name is "DROID", otherwise False
     """
 
-    return True if candidate.name == "DROID" else False
+    return True if advertising_data.local_name == "DROID" else False
 
 async def discover_droid(retry: bool = False) -> DroidConnection:
     """
@@ -204,21 +214,37 @@ async def discover_droid(retry: bool = False) -> DroidConnection:
     """
 
     discovered_droid = None
-    while retry and discovered_droid is None:
-        try:
-            discovered_droid = await BleakScanner.find_device_by_filter(find_droid)
-            if discovered_droid is None:
-                if not retry:
-                    logging.error("Droid discovery timed out.")
-                    return
-                else:
-                    logging.warning("Droid discovery timed out. Retrying...")
-                    continue
-        except BleakError as err:
-            logging.warning("Droid discovery failed. Retrying...")
-            continue
+    async with BleakScanner() as scanner:      
+        await scanner.start()
 
+        droids = []
+        while retry and len(droids) == 0:        
+            possible_droids = scanner.discovered_devices_and_advertisement_data
+            if len(possible_droids) == 0:
+                await asyncio.sleep(5)
 
-    logging.info(f"Droid successfully discovered: [ {discovered_droid} ]")
-    d = DroidConnection(discovered_droid)
+            for possible_droid_address in possible_droids:
+                ble_device, advertising_data = possible_droids[possible_droid_address]
+                if (ble_device.name == "DROID"):
+                    droids.append((ble_device, advertising_data.manufacturer_data))
+
+            try:      
+                if len(droids) == 0:
+                    if not retry:
+                        logging.error("Droid discovery timed out.")
+                        return
+                    else:
+                        logging.warning("Droid discovery timed out. Retrying...")
+                        continue
+            except BleakError as err:
+                logging.warning("Droid discovery failed. Retrying...")
+                continue
+
+            discovered_droid = droids[0]
+    
+    if discovered_droid is None:
+        return None
+
+    logging.info(f"Droid successfully discovered: [ {discovered_droid[0]} ]")
+    d = DroidConnection(*discovered_droid)
     return d

@@ -37,7 +37,7 @@ async def main() -> None:
         pass
     finally:
         print("Shutting down.")
-        await d.disconnect(silent=True)
+        await d.disconnect()
 
 # Main entry point into the example application
 if __name__ == "__main__":

@@ -51,7 +51,10 @@ def get_service_command_args(input_list: list) -> list:
 
 async def main() -> None:
 
-    d = await discover_droid(retry=True)
+    try:
+        d = await discover_droid(retry=True)
+    except:
+        raise
     
     head_leds = [DroidLedIdentifier.RUnitLeftHeadLed, DroidLedIdentifier.RUnitMiddleHeadLed, DroidLedIdentifier.RUnitRightHeadLed]
     try:
@@ -90,7 +93,7 @@ async def main() -> None:
         pass
     finally:
         print("\nShutting down.")
-        await d.disconnect(silent=True)
+        await d.disconnect()
 
 if __name__ == "__main__":
     asyncio.run(main())

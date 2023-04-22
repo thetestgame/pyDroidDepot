@@ -49,3 +49,11 @@ class DroidMultipurposeCommand(object):
     RotateBUnitHead = 4
     DriveBUnit = 5
 
+class DroidAffiliation(object):
+    """
+    Represents a droid's affiliation for BLE interactions and audio playback.
+    """
+
+    Scoundrel = 1
+    Resistenace = 5
+    FirstOrder = 9
