@@ -1,4 +1,7 @@
 """
+This module provides classes for controlling the motor functions of a SWGE DroidDepot droid.
+
+The classes contained in this module are licensed under the MIT License.
 """
 
 from droid.utils import int_to_hex
@@ -6,6 +9,7 @@ from droid.protocol import DroidCommand, DroidMultipurposeCommand
 
 class DroidMotorDirection(object):
     """
+    Enumeration of motor directions.
     """
 
     Forward = 0
@@ -16,6 +20,7 @@ class DroidMotorDirection(object):
 
 class DroidMotorIdentifier(object):
     """
+    Enumeration of motor identifiers.
     """
 
     LeftMotor = 0
@@ -24,16 +29,28 @@ class DroidMotorIdentifier(object):
 
 class DroidMotorController(object):
     """
+    Class for controlling the motor functions of a SWGE DroidDepot droid.
     """
 
     def __init__(self, droid: object) -> None:
         """
+        Initializes a new instance of the DroidMotorController class.
+
+        Args:
+            droid: A DroidConnection object representing the connection to the droid.
         """
 
         self.droid = droid
 
     async def send_motor_speed_command(self, direction: int, motor_id: int, speed: int = 160, ramp_speed: int = 300) -> None:
         """
+        Sends a motor speed command to the droid.
+
+        Args:
+            direction (int): An integer representing the motor direction. Should be one of the values defined in the DroidMotorDirection class.
+            motor_id (int): An integer representing the motor identifier. Should be one of the values defined in the DroidMotorIdentifier class.
+            speed (int): An integer representing the motor speed. Defaults to 160.
+            ramp_speed (int): An integer representing the motor ramp speed. Defaults to 300.
         """
 
         motor_select = "%s%s" % (direction, motor_id)
@@ -42,6 +59,12 @@ class DroidMotorController(object):
 
     async def rotate_head(self, direction: int, speed: int = 160, ramp_speed: int = 300) -> None:
         """
+        Rotates the head of the droid.
+
+        Args:
+            direction (int): An integer representing the direction to rotate the head. Should be one of the values defined in the DroidMotorDirection class.
+            speed (int): An integer representing the rotation speed. Defaults to 160.
+            ramp_speed (int): An integer representing the rotation ramp speed. Defaults to 300.
         """
 
         if direction != DroidMotorDirection.Left and direction != DroidMotorDirection.Right:
@@ -51,12 +74,18 @@ class DroidMotorController(object):
 
     async def stop_head(self) -> None:
         """
+        Stops the rotation of the head.
         """
 
         await self.rotate_head(DroidMotorDirection.Left, 0)
 
     async def center_head(self, speed: int = 255, offset: int  = 0) -> None:
         """
+        Centers the head of the droid.
+
+        Args:
+            speed (int): An integer representing the speed at which to center the head. Defaults to 255.
+            offset (int): An integer representing the offset from center. Defaults to 0.
         """
 
         command_data = "%s%s" % (int_to_hex(speed), int_to_hex(offset))

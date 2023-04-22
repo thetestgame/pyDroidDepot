@@ -1,15 +1,15 @@
 """
-DroidConnection is a class that represents a connection to a SWGE DroidDepot droid using BLE protocol. 
-It provides methods for connecting and disconnecting to the droid, sending commands to it, and executing scripts. 
-The class also contains instances of DroidAudioController, DroidMotorController, and DroidScriptEngine, 
-which are used to control the droid's audio, motor, and script functions, respectively.
+DroidConnection is a BLE class representing a connection to a SWGE DroidDepot droid. 
+It includes methods for connecting, disconnecting, sending commands, and running scripts on the droid.
 
-The DroidConnection class takes one argument, profile, which is a string representing the UUID of the BLE profile to connect to. 
-After connecting to the droid using the connect method, the send_droid_command method can be used to send commands to the droid, 
-and the execute_script method can be used to execute pre-defined scripts on the droid. 
-The disconnect method can be used to disconnect from the droid.
+It also includes instances of DroidAudioController, DroidMotorController, and DroidScriptEngine 
+to manage the droid's audio, motor, and script functions.
 
-This class is licensed under the MIT License.
+The class only takes one argument, the "profile" string, which is the BLE profile UUID to connect to. 
+Once connected, "send_droid_command" sends commands to the droid, and "execute_script" runs pre-defined scripts. 
+Use "disconnect" to end the connection.
+
+This class is licensed under MIT.
 """
 
 import asyncio
@@ -30,7 +30,7 @@ class DroidConnection(object):
         profile (str): A string representing the UUID of the BLE profile to connect to.
     """
 
-    def __init__(self, profile):
+    def __init__(self, profile: str):
         """
         Initializes a new instance of the Droid class.
 
@@ -53,7 +53,7 @@ class DroidConnection(object):
         Connect to the Droid using BLE.
         """
 
-        timeout=0.0
+        timeout = 0.0
         self.droid = BleakClient(self.profile)
         await self.droid.connect()
         while not self.droid.is_connected and timeout < 10:
