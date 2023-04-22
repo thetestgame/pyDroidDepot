@@ -55,7 +55,7 @@ class DroidMotorController(object):
 
         await self.rotate_head(DroidMotorDirection.Left, 0)
 
-    async def center_unit_head(self, speed: int = 255, offset: int  = 0) -> None:
+    async def center_head(self, speed: int = 255, offset: int  = 0) -> None:
         """
         """
 

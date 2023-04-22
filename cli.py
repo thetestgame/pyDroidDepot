@@ -57,7 +57,7 @@ async def main() -> None:
     try:
         await d.connect()
         await d.audio_controller.set_volume(0)
-        await d.motor_controller.center_unit_head()
+        await d.motor_controller.center_head()
 
         while d.droid.is_connected:
             command = input("Command:")

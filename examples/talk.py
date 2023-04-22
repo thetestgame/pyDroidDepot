@@ -21,7 +21,7 @@ async def main() -> None:
             await d.audio_controller.set_volume(20)
             await d.script_engine.execute_script(randrange(1, 7))
             sleep(2)
-            await d.motor_controller.center_unit_head()
+            await d.motor_controller.center_head()
             
             sleep(randrange(10, 30))
             
