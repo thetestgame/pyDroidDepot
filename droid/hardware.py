@@ -16,7 +16,7 @@ class DroidAudioBankIdentifier(object):
     DroidDepotAudioBank = 2
     ResistenceAudioBank = 3
     UnknownAudioBank = 4
-    OgasCantinaAudioBank = 5
+    DroidDetectorAudioBank = 5
     DokOndarsAudioBank = 6
     FirstOrderAudioBank = 7
     InitialActivationAudioBank = 8
@@ -91,7 +91,7 @@ class DroidPersonalityIdentifier(object):
         DroidAudioBankIdentifier.DroidDepotAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 4, Black: 6, Red2: 5, CB23: 5, C110P: 13, Yellow: 5, DarkBlue: 4, BUnit: 6, RUnit: 4, BBUnit: 3 },
         DroidAudioBankIdentifier.ResistenceAudioBank:           { Blue: 5, Gray: 5, Red: 5, Orange: 5, Purple: 5, Black: 5, Red2: 5, CB23: 5, C110P: 5,  Yellow: 5, DarkBlue: 4, BUnit: 6, RUnit: 3, BBUnit: 3 },
         DroidAudioBankIdentifier.UnknownAudioBank:              { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
-        DroidAudioBankIdentifier.OgasCantinaAudioBank:          { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
+        DroidAudioBankIdentifier.DroidDetectorAudioBank:          { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },
         DroidAudioBankIdentifier.DokOndarsAudioBank:            { Blue: 5, Gray: 3, Red: 3, Orange: 3, Purple: 4, Black: 5, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 4, BUnit: 5, RUnit: 4, BBUnit: 5 },
         DroidAudioBankIdentifier.FirstOrderAudioBank:           { Blue: 3, Gray: 5, Red: 3, Orange: 3, Purple: 5, Black: 3, Red2: 5, CB23: 5, C110P: 6,  Yellow: 5, DarkBlue: 5, BUnit: 5, RUnit: 5, BBUnit: 5 },
         DroidAudioBankIdentifier.InitialActivationAudioBank:    { Blue: 1, Gray: 1, Red: 1, Orange: 1, Purple: 1, Black: 1, Red2: 1, CB23: 1, C110P: 1,  Yellow: 1, DarkBlue: 1, BUnit: 1, RUnit: 1, BBUnit: 1 },

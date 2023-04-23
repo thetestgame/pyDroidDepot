@@ -34,32 +34,19 @@ def hex_to_int(hex_str: str) -> int:
     
     return int(hex_str, 16)
 
-def dbm_to_hex(dbm_val):
+def dbm_to_hex(dbm_val: int) -> str:
     """
     Convert a dBm value to its corresponding hex integer string.
 
     Args:
-        dbm_val (float): The dBm value to convert.
+        dbm_val (int): The dBm value to convert.
 
     Returns:
         str: The hex integer string corresponding to the input dBm value.
     """
-    
-    # Convert the dBm value to an integer
-    dbm_int = int((dbm_val + 45.0) * 2)
-    
-    # Check if the dBm value is negative (i.e., if the hex value should be two's complement)
-    if dbm_int < 0:
-        # Convert the negative dBm value to its two's complement representation
-        hex_int = ((~abs(dbm_int) & 0xFF) + 1)
-    else:
-        # Convert the positive dBm value directly
-        hex_int = dbm_int
-    
-    # Convert the hex integer to a string
-    hex_str = format(hex_int, '02X')
-    
-    return hex_str
+        
+    dbm_val = int((dbm_val - 0x80) / -1)
+    return int_to_hex(dbm_val)
 
 def hex_to_dbm(hex_str: str) -> float:
     """
