@@ -46,7 +46,7 @@ class DroidAudioCommand(object):
     PlayAudioFromSelectedGroup = 24
     CycleAudioFromSelectedGroup = 28
     SetSelectedSoundBank = 31
-    SetLoopedAudio = 33
+    LoopSoundBank = 33
     UnknownCommand2 = 66
     UnknownCommand3 = 68
     FlashHeadLeds = 69
