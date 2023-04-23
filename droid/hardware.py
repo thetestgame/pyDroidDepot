@@ -25,6 +25,14 @@ class DroidAudioBankIdentifier(object):
     BlasterAcessoryAudioBank = 11
     ThrusterAccessoryAudioBank = 12
 
+    TalkingBanks = [
+        GeneralUseAudioBank,
+        DroidDepotAudioBank,
+        ResistenceAudioBank,
+        UnknownAudioBank,
+        DokOndarsAudioBank,
+        FirstOrderAudioBank]
+
 class DroidAffiliation(object):
     """
     Represents a droid's affiliation for BLE interactions and audio playback.
