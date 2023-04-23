@@ -26,7 +26,6 @@ class DroidAudioBankIdentifier(object):
     ThrusterAccessoryAudioBank = 12
 
     TalkingBanks = [
-        GeneralUseAudioBank,
         DroidDepotAudioBank,
         ResistenceAudioBank,
         UnknownAudioBank,

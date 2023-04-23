@@ -56,14 +56,20 @@ def create_droid_beacon_payload(droid_paired: bool = True, affiliation_id: int =
     """
     """
 
+    droid_paired_byte = 0x80 + int(droid_paired)
+    affiliation_byte = (affiliation_id * 2) + 0x80
+    personality_byte = personality_id
+    hex_string = f"030444{droid_paired_byte:02X}{affiliation_byte:02X}{personality_byte:02X}"
+    return hex_string
+
 def decode_droid_beacon_payload(payload: str) -> dict:
     """
     Decodes a SWGE droid beacon payload into its various parts
     """
 
     data_length = hex_to_int(payload[4:6])  - 0x40
-    droid_paired = True if payload[6:8] == '0x81' else False
-    affiliation_id = hex_to_int(payload[8:10]) - 0x80
+    droid_paired = hex_to_int(payload[6:8]) - 0x80
+    affiliation_id = int((hex_to_int(payload[8:10]) - 0x80) / 2)
     personality_id = hex_to_int(payload[10:12])
 
     return { 'data_length': data_length, 'droid_paired': droid_paired, 'affiliation_id': affiliation_id, 'personality_id': personality_id }
