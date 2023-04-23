@@ -50,7 +50,7 @@ async def main() -> None:
         await d.connect()
         await d.motor_controller.center_head()
 
-        while d.droid.is_connected:
+        while d.droid.is_connected:            
             command = input("Command:")
             command_parts = command.split(',')
             if len(command_parts) < 2:
@@ -62,7 +62,9 @@ async def main() -> None:
             service_command_parts = get_service_command_args(command_parts)
 
             try:
-                if service_component_name == "audio":
+                if service_component_name == "connection":
+                    await execute_service_command(d, service_component_method, service_command_parts)
+                elif service_component_name == "audio":
                     await execute_service_command(d.audio_controller, service_component_method, service_command_parts)
                 elif service_component_name == "script":
                     await execute_service_command(d.script_engine, service_component_method, service_command_parts)
