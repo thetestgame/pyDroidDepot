@@ -194,20 +194,6 @@ class DroidConnection(object):
         command = "44%s%s" % ("{:02d}".format(command_id), data)
         await self.send_droid_command(DroidCommand.MultipurposeCommand, command)
 
-def find_droid(device: object, advertising_data: AdvertisementData) -> bool:
-    """
-    Returns True if the candidate device name is "DROID", otherwise returns False.
-
-    Args:
-        device (Bleak Device): the Bluetooth device being scanned
-        advertising_data (Advertisement Data): additional data collected during the scan
-    
-    Returns:
-        True if the candidate device name is "DROID", otherwise False
-    """
-
-    return True if advertising_data.local_name == "DROID" else False
-
 async def discover_droid(retry: bool = False) -> DroidConnection:
     """
     Scans for nearby Bluetooth devices until a device named "DROID" is found. If retry is True, the function will
