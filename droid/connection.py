@@ -29,6 +29,8 @@ class DroidConnection(object):
         manufacturer_data (dict): A dictionary containing the manufacturer data of the droid being connected.
     """
 
+    DroidServiceId = '09b600a0-3e42-41fc-b474-e9c0c8f0c801'
+
     def __init__(self, profile: str, manufacturer_data):
         """
         Initializes a new instance of the Droid class.
@@ -70,6 +72,7 @@ class DroidConnection(object):
         timeout = 0.0
         self.droid = BleakClient(self.profile)
         await self.droid.connect()
+        await self.droid.start_notify(DroidBluetoothCharacteristics.DroidNotifyCharacteristic, self.notification_handler)
 
         while not self.droid.is_connected and timeout < 10:
             sleep (.1)
@@ -80,6 +83,7 @@ class DroidConnection(object):
         await self.droid.write_gatt_char(0x000d, connect_code, False)
 
         droid_data = self.manufacturer_data[DisneyManufacturerId]
+
         droid_data_len = len(droid_data)
         self.personality_id = droid_data[droid_data_len - 1]
         self.affiliation_id = (droid_data[droid_data_len - 2] - 0x80) / 2
@@ -91,6 +95,13 @@ class DroidConnection(object):
         self.heartbeat_thread = Thread(target=self.__start_heartbeat_loop, args=(self.heartbeat_loop,), daemon=True)
         self.heartbeat_thread.start()
         asyncio.run_coroutine_threadsafe(self.__send_heartbeat_command(), self.heartbeat_loop)
+
+    async def notification_handler(self, sender: object, data: bytearray) -> None:
+        """
+        Processes notification events from the connected droid
+        """
+
+        print("Received notification (%s):" % sender, data.hex())
 
     def __start_heartbeat_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         """
@@ -115,11 +126,13 @@ class DroidConnection(object):
         Disconnect from the Droid.
         """
 
+        if not self.droid.is_connected:
+            return
+
         logging.info("Disconnecting from droid")
         try:
             if not silent:
                 await self.audio_controller.play_shutdown_audio()
-                sleep(3)
         finally:
             await self.droid.disconnect()
 
@@ -178,7 +191,7 @@ class DroidConnection(object):
         """
 
         command = self.build_droid_command(command_id, data)
-        await self.droid.write_gatt_char(0x000d, bytearray.fromhex(command.hex()))
+        await self.droid.write_gatt_char(DroidBluetoothCharacteristics.DroidCommandCharacteristic, bytearray.fromhex(command.hex()))
 
     async def send_droid_multi_command(self, command_id: int, data: str = "") -> None:
         """
@@ -193,6 +206,12 @@ class DroidConnection(object):
 
         command = "44%s%s" % ("{:02d}".format(command_id), data)
         await self.send_droid_command(DroidCommand.MultipurposeCommand, command)
+
+    async def request_droid_firmware_information(self) -> None:
+        """
+        """
+
+        await self.send_droid_command(DroidCommand.RetrieveFirmwareInformation)
 
 async def discover_droid(retry: bool = False) -> DroidConnection:
     """
