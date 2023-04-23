@@ -21,7 +21,7 @@ class DroidScripts(object):
     UnknownParkResponseScript = 4
     OgasCantinaParkResponseScript = 5
     DokOndarsParkResponseScript = 6
-    FirstOrderParkResposneScript = 7
+    FirstOrderParkResponseScript = 7
     DroidBayActivationSequence = 8
     UnknownBUnitScript9 = 9
     UnknownBUnitScript10 = 10

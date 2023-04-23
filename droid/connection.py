@@ -29,6 +29,7 @@ class DroidConnection(object):
 
     Args:
         profile (str): A string representing the UUID of the BLE profile to connect to.
+        manufacturer_data (dict): A dictionary containing the manufacturer data of the droid being connected.
     """
 
     def __init__(self, profile: str, manufacturer_data):
@@ -37,9 +38,18 @@ class DroidConnection(object):
 
         Args:
             profile (str): A string representing the UUID of the BLE profile to connect to.
-            manufacturer_data (dict): a Dictionary containing the manufacturer data of the droid being connected.
+            manufacturer_data (dict): A dictionary containing the manufacturer data of the droid being connected.
+
+        Attributes:
+            droid: A BLE connection object for the droid.
+            personality_id: The personality ID of the droid. Default is DroidPersonalityIdentifier.RUnit.
+            affiliation_id: The affiliation ID of the droid. Default is DroidAffiliation.Scoundrel.
+            audio_controller: An instance of the DroidAudioController class.
+            script_engine: An instance of the DroidScriptEngine class.
+            motor_controller: An instance of the DroidMotorController class.
+            heartbeat_loop: An asyncio event loop used for the heartbeat thread.
+            heartbeat_thread: A thread that runs the heartbeat_loop.
         """
-        
         
         self.profile = profile
         self.droid = None
