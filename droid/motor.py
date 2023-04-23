@@ -57,6 +57,19 @@ class DroidMotorController(object):
         motor_command = "%s%s%s0000" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed))
         await self.droid.send_droid_command(DroidCommand.SetMotorSpeed, motor_command)
 
+    async def set_movement_speed(self, direction: int, speed: int = 100, ramp_speed: int = 300) -> None:
+        """
+        Sends a motor speed command to the droid to both the left and right movement motors.
+
+        Args:
+            direction (int): An integer representing the motor direction. Should be one of the values defined in the DroidMotorDirection class.
+            speed (int): An integer representing the motor speed. Defaults to 160.
+            ramp_speed (int): An integer representing the motor ramp speed. Defaults to 300.
+        """
+
+        await self.send_motor_speed_command(direction, DroidMotorIdentifier.LeftMotor, speed, ramp_speed)
+        await self.send_motor_speed_command(direction, DroidMotorIdentifier.RightMotor, speed, ramp_speed)
+
     async def rotate_head(self, direction: int, speed: int = 160, ramp_speed: int = 300) -> None:
         """
         Rotates the head of the droid.
