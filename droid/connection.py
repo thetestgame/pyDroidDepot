@@ -5,10 +5,6 @@ It includes methods for connecting, disconnecting, sending commands, and running
 It also includes instances of DroidAudioController, DroidMotorController, and DroidScriptEngine 
 to manage the droid's audio, motor, and script functions.
 
-The class only takes one argument, the "profile" string, which is the BLE profile UUID to connect to. 
-Once connected, "send_droid_command" sends commands to the droid, and "execute_script" runs pre-defined scripts. 
-Use "disconnect" to end the connection.
-
 This class is licensed under MIT.
 """
 
