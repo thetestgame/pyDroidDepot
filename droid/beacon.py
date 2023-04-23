@@ -54,6 +54,7 @@ def decode_location_beacon_payload(payload: str) -> dict:
 
 def create_droid_beacon_payload(droid_paired: bool = True, affiliation_id: int = 1, personality_id: int = 1) -> str:
     """
+    Creates a droid beacon payload for a droid given its paired state, affilitation id, and personality id
     """
 
     droid_paired_byte = 0x80 + int(droid_paired)
