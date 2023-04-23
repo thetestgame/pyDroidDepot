@@ -52,7 +52,7 @@ class DroidConnection(object):
         self.droid = None
         self.manufacturer_data = manufacturer_data
         self.personality_id = DroidPersonalityIdentifier.RUnit
-        self.affilliation_id = DroidAffiliation.Scoundrel
+        self.affiliation_id = DroidAffiliation.Scoundrel
 
         self.audio_controller = DroidAudioController(self)
         self.script_engine = DroidScriptEngine(self)
@@ -82,7 +82,7 @@ class DroidConnection(object):
         droid_data = self.manufacturer_data[DisneyManufacturerId]
         droid_data_len = len(droid_data)
         self.personality_id = droid_data[droid_data_len - 1]
-        self.affilliation_id = (droid_data[droid_data_len - 2] - 0x80) / 2
+        self.affiliation_id = (droid_data[droid_data_len - 2] - 0x80) / 2
         
         if not silent:
             await self.script_engine.execute_script(DroidScripts.DroidPairingSequence1)

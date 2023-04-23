@@ -1,4 +1,7 @@
 """
+Module for working with SWGE Beacon data and emulating park beacons
+
+This code is MIT licensed.
 """
 
 from droid.utils import *
@@ -39,6 +42,7 @@ def create_location_beacon_payload(script_id: int, reaction_interval: int, signa
 
 def decode_location_beacon_payload(payload: str) -> dict:
     """
+    Decodes a SWGE location beacon payload into its various parts
     """
 
     script_id = hex_to_int(payload[4:6])
@@ -47,3 +51,19 @@ def decode_location_beacon_payload(payload: str) -> dict:
     droid_paired = bool(hex_to_int(payload[10:12]))
 
     return { 'script_id': script_id, 'reaction_interval': reaction_interval, 'signal_strength': signal_strength, 'droid_paired': droid_paired }
+
+def create_droid_beacon_payload(droid_paired: bool = True, affiliation_id: int = 1, personality_id: int = 1) -> str:
+    """
+    """
+
+def decode_droid_beacon_payload(payload: str) -> dict:
+    """
+    Decodes a SWGE droid beacon payload into its various parts
+    """
+
+    data_length = hex_to_int(payload[4:6])  - 0x40
+    droid_paired = True if payload[6:8] == '0x81' else False
+    affiliation_id = hex_to_int(payload[8:10]) - 0x80
+    personality_id = hex_to_int(payload[10:12])
+
+    return { 'data_length': data_length, 'droid_paired': droid_paired, 'affiliation_id': affiliation_id, 'personality_id': personality_id }

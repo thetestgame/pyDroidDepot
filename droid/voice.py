@@ -27,9 +27,9 @@ class DroidVoiceController(object):
         Returns a voice bank id for the droid's configuration that can be viewed as "happy" or "excited"
         """
 
-        if self.droid.affilliation_id == DroidAffiliation.Resistenace:
+        if self.droid.affiliation_id == DroidAffiliation.Resistenace:
             return DroidAudioBankIdentifier.ResistenceAudioBank
-        elif self.droid.affilliation_id == DroidAffiliation.FirstOrder:
+        elif self.droid.affiliation_id == DroidAffiliation.FirstOrder:
             return DroidAudioBankIdentifier.FirstOrderAudioBank
         else:
             return self.get_random_indifferent_voice_bank_id()
@@ -39,9 +39,9 @@ class DroidVoiceController(object):
         Returns a voice bank id for the droids configuration that can be viewed as "upset" or "scared"
         """
 
-        if self.droid.affilliation_id == DroidAffiliation.Resistenace:
+        if self.droid.affiliation_id == DroidAffiliation.Resistenace:
             return DroidAudioBankIdentifier.FirstOrderAudioBank
-        elif self.droid.affilliation_id == DroidAffiliation.FirstOrder:
+        elif self.droid.affiliation_id == DroidAffiliation.FirstOrder:
             return DroidAudioBankIdentifier.ResistenceAudioBank
         else:
             return self.get_random_indifferent_voice_bank_id()
@@ -52,7 +52,7 @@ class DroidVoiceController(object):
         """
 
         options = list(DroidAudioBankIdentifier.TalkingBanks)
-        if self.droid.affilliation_id != DroidAffiliation.Scoundrel:
+        if self.droid.affiliation_id != DroidAffiliation.Scoundrel:
             options.remove(self.get_upset_voice_bank_id())
         return random.choice(options)
 
