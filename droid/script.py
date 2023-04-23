@@ -8,8 +8,12 @@ This module contains classes and functions for interacting with droid scripts.
 This code is MIT licensed.
 """
 
+import asyncio
+import logging
+from datetime import datetime
+from threading import Thread
 from droid.protocol import DroidCommand
-from droid.beacon import decode_location_beacon_payload
+from droid.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 
 class DroidScripts(object):
     """
@@ -55,6 +59,10 @@ class DroidScriptEngine(object):
 
         self.droid = droid
 
+        self.__location_reaction_tracker = {}
+        self.reaction_scanner = DroidReactionBeaconScanner()
+        self.reaction_scanner.add_location_handler(self.__perform_droid_location_reactions)
+
     async def send_script_command(self, script_id: int, script_action: int) -> None:
         """
             Sends a script command to the droid.
@@ -64,14 +72,18 @@ class DroidScriptEngine(object):
                 script_action (int): The action to perform with the script.
 
             Raises:
-                ValueError: If the script ID is 13 (FullThrottleTestScript).
+                ValueError: If the script ID is 13 (FullThrottleTestScript) or
+                the script is less then 0.
         """
 
+        if script_id <= 0 and script_action != DroidScriptActions.CloseScript:
+            raise ValueError("Invalid script id requested. Script ids must be larger then 0")
+
         if script_id == 13:
-            raise ValueError("Attempted to execute a dangerous script. Execution denied")
+            raise ValueError("Attempted to use a dangerous script. Execution denied")
 
         command_data = "%s%s" % ("{:02d}".format(script_id), "{:02d}".format(script_action))
-        await self.droid.send_droid_command(DroidCommand.ScriptCommand, command_data)
+        await self.droid.send_droid_command(DroidCommand.ScriptActionComand, command_data)
 
     async def execute_script(self, script_id: int) -> None:
         """
@@ -79,7 +91,6 @@ class DroidScriptEngine(object):
 
         Args:
             script_id (int): The ID of the script to execute.
-
         """
 
         await self.send_script_command(script_id, DroidScriptActions.ExecuteScript)
@@ -96,9 +107,86 @@ class DroidScriptEngine(object):
         data = decode_location_beacon_payload(payload)
         await self.execute_script(data['script_id'])
 
-    async def stop_script_execution(self) -> None:
+    async def open_script(self, script_id: int) -> None:
         """
-        Stops the execution of a running script.
+        Opens a droid script for writing. All command sent after the script is opened will be
+        written into the script id until close_script is called
+
+        Args:
+            script_id (int): The ID of the script to open for writing.
         """
 
-        await self.send_script_command(0, DroidScriptActions.CloseScript)
+        if script_id >= 1 and script_id <= 13:
+            raise ValueError("Attempted to rewrite Disney programmed scripts. Action prevented for safety")
+
+        await self.send_script_command(script_id, DroidScriptActions.OpenScript)
+
+    async def close_script(self, script_id: int = 0) -> None:
+        """
+        Closes the currently open script. This will also stop any script currently
+        being executed.
+
+        Args:
+            script_id (int): The ID of the script to close.
+        """
+
+        await self.send_script_command(script_id, DroidScriptActions.CloseScript)
+
+    def __calculate_reaction_time(self, interval: int) -> int:
+        """
+        Calculates the time in seconds from a park beacon's reaction interval.
+        """
+
+        interval = interval * 5
+        if interval < 60:
+            interval = 60
+
+        return interval
+
+    async def __perform_droid_location_reactions(self, locations: list) -> None:
+        """
+        """
+
+        # Verify we have at least one location to react to first.
+        if len(locations) == 0:
+            return
+        
+        can_execute = True
+        already_executed = False
+        for location_beacon_address in locations:
+            try:
+                location_data = locations[location_beacon_address]
+
+                # Check if we already reacted and if we have check if we are in a new reaction window
+                if location_beacon_address in self.__location_reaction_tracker:
+                    last_execution = self.__location_reaction_tracker[location_beacon_address]
+                    time_since_last = (datetime.now() - last_execution).total_seconds()
+                    can_execute = time_since_last >= self.__calculate_reaction_time(location_data['reaction_interval'])
+
+                # Attempt to execute the reaction
+                if can_execute and already_executed == False:
+                    await self.execute_script(location_data['script_id'])
+                    self.__location_reaction_tracker[location_beacon_address] = datetime.now()
+                    already_executed = True
+            except ValueError:
+                logging.error('Failed to handle location beacon execution. Likely attempted to execute a dangerous script')
+            except Exception as e:
+                logging.error('An unexpected error occured processing a park location beacon: %s' % location_beacon_address)
+                logging.error(e, exc_info=True) 
+
+        if already_executed:
+            await asyncio.sleep(5)
+
+    def start_beacon_reactions(self) -> None:
+        """
+        Enables SWGE park beacon reactions similar to the internal firmware.
+        """
+
+        self.reaction_scanner.start()
+
+    def stop_beacon_reactions(self) -> None:
+        """
+        Disables park beacon reactions.
+        """
+
+        self.reaction_scanner.stop()

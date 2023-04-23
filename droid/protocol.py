@@ -3,6 +3,14 @@ This module defines the DroidCommand and DroidMultipurposeCommand classes used t
 define the constant command identifiers to communicate with a SWGE droid.
 """
 
+class DroidBluetoothCharacteristics(object):
+    """
+    a constants class representing the characteristics available on droid depot droids
+    """
+
+    DroidCommandCharacteristic = '09b600b1-3e42-41fc-b474-e9c0c8f0c801'
+    DroidNotifyCharacteristic = '09b600b0-3e42-41fc-b474-e9c0c8f0c801'
+
 class DroidCommand(object):
     """
     A class representing the available droid commands.
@@ -14,7 +22,7 @@ class DroidCommand(object):
         FlashPairingLed (int): Command to flash the pairing LED.
         SetMotorSpeed (int): Command to set the motor speed.
         UnusedCommand (int): An unused command.
-        ScriptCommand (int): Command to execute a script.
+        ScriptActionComand (int): Command to execute a script.
         ScriptDelay (int): Command to delay script execution.
         MultipurposeCommand (int): Command to send a multipurpose command.
     """
@@ -24,8 +32,8 @@ class DroidCommand(object):
     SetRGBLedState = 3
     FlashPairingLed = 4
     SetMotorSpeed = 5
-    UnusedCommand = 6
-    ScriptCommand = 12
+    ScriptWriteCommand = 6
+    ScriptActionComand = 12
     ScriptDelay = 13
     MultipurposeCommand = 15
 

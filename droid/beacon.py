@@ -5,6 +5,18 @@ This code is MIT licensed.
 """
 
 from droid.utils import *
+from bleak import BleakScanner
+from threading import Thread
+import logging
+import asyncio
+
+class DisneyBLEBeaconType(object):
+    """
+    Constants representing the types of BLE beacons found in Disney parks.
+    """
+
+    DisneyiBeacon = 76
+    DroidReactionBeacon = 387
 
 class DroidBeaconType(object):
     """
@@ -94,3 +106,127 @@ def decode_droid_beacon_payload(payload: str) -> dict:
     personality_id = hex_to_int(payload[10:12])
 
     return { 'data_length': data_length, 'droid_paired': droid_paired, 'affiliation_id': affiliation_id, 'personality_id': personality_id }
+
+class DroidReactionBeaconScanner(object):
+    """
+    A class for scanning and decoding Disney BLE droid reaction beacons.
+    """
+    
+    def __init__(self):
+        """
+        Initializes a new instance of the DroidReactionBeaconScanner class.
+        """
+
+        self.__location_handlers = []
+        self.__droid_handlers = []
+
+        self.__scan_loop = asyncio.new_event_loop()
+        self.__scan_thread = None
+
+    def add_location_handler(self, handler: object) -> None:
+        """
+        """
+
+        if handler not in self.__location_handlers:
+            self.__location_handlers.append(handler)
+
+    def remove_location_handler(self, handler: object) -> None:
+        """
+        """
+
+        if handler in self.__location_handlers:
+            self.__location_handlers.remove(handler)
+
+    def add_droid_handler(self, handler: object) -> None:
+        """
+        """
+
+        if handler not in self.__droid_handlers:
+            self.__droid_handlers.append(handler)
+
+    def remove_droid_handler(self, handler: object) -> None:
+        """
+        """
+
+        if handler in self.__droid_handlers:
+            self.__droid_handlers.remove(handler)
+
+    async def __scan(self) -> None:
+        """
+        Scans for nearby Disney BLE droid reaction beacons and decodes their data.
+        """
+
+        async with BleakScanner() as scanner:
+            await scanner.start()
+
+            while True:
+                devices = scanner.discovered_devices_and_advertisement_data
+                visible_droids = {}
+                locations_in_range = {}
+                
+                for device_address in devices:
+                    try:
+                        # Check if the device is advertising with the expected manufacturer ID
+                        device, data = devices[device_address]
+                        if self.__is_droid_beacon(data.manufacturer_data):
+                            beacon_payload = data.manufacturer_data[DisneyBLEBeaconType.DroidReactionBeacon]
+                            beacon_payload = beacon_payload.hex()
+
+                            # Decode the beacon data based on type
+                            beacon_type = hex_to_int(beacon_payload[:2])
+                            if beacon_type == DroidBeaconType.DroidIdentificationBeacon:
+                                beacon_data = decode_droid_beacon_payload(beacon_payload)
+                                visible_droids[device_address] = beacon_data
+                            elif beacon_type == DroidBeaconType.ParkLocationBeacon:    
+                                beacon_data = decode_location_beacon_payload(beacon_payload)
+                                if beacon_data['signal_strength'] >= data.rssi:
+                                    locations_in_range[device_address] = beacon_data
+                            else:
+                                logging.warning('Discovered unknown droid beacon type: %s' % beacon_type)
+                    except Exception as e:
+                        logging.error('An unexpected error occured processing bluetooth device: %s' % device_address)
+                        logging.error(e, exc_info=True) 
+
+                for handler in self.__location_handlers:
+                    await handler(locations_in_range)
+
+                for handler in self.__droid_handlers:
+                    await handler(visible_droids)
+
+                await asyncio.sleep(2)
+
+    def __start_scan_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        """
+        Starts the beacon scanning event loop
+        """
+
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+
+    def __is_droid_beacon(self, data: dict) -> bool:
+        """
+        Checks if the given data contains data can a droid can react to.
+        """
+
+        return DisneyBLEBeaconType.DroidReactionBeacon in data
+
+    def start(self) -> None:
+        """
+        Starts the beacon scanner
+        """
+
+        if self.__scan_loop.is_running():
+            return
+
+        self.heartbeat_thread = Thread(target=self.__start_scan_loop, args=(self.__scan_loop,), daemon=True)
+        self.heartbeat_thread.start()
+        asyncio.run_coroutine_threadsafe(self.__scan(), self.__scan_loop)
+
+    def stop(self) -> None:
+        """
+        Stops the beacon scanner
+        """
+
+        if self.__scan_loop.is_running():
+            self.__scan_loop.stop()
+            self.__scan_thread.join()
