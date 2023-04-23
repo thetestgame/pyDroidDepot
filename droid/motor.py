@@ -42,7 +42,7 @@ class DroidMotorController(object):
 
         self.droid = droid
 
-    async def send_motor_speed_command(self, direction: int, motor_id: int, speed: int = 160, ramp_speed: int = 300) -> None:
+    async def send_motor_speed_command(self, direction: int, motor_id: int, speed: int = 160, ramp_speed: int = 300, delay = 0) -> None:
         """
         Sends a motor speed command to the droid.
 
@@ -53,8 +53,14 @@ class DroidMotorController(object):
             ramp_speed (int): An integer representing the motor ramp speed. Defaults to 300.
         """
 
+        delay_hex = int_to_hex(delay)
+        if len(delay_hex) < 4:
+            missing = 4 - len(delay_hex)
+            for x in range(missing):
+                delay_hex = '0' + delay_hex
+
         motor_select = "%s%s" % (direction, motor_id)
-        motor_command = "%s%s%s0000" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed))
+        motor_command = "%s%s%s%s" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed), delay_hex)
         await self.droid.send_droid_command(DroidCommand.SetMotorSpeed, motor_command)
 
     async def set_movement_speed(self, direction: int, speed: int = 100, ramp_speed: int = 300) -> None:
