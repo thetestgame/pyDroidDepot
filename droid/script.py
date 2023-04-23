@@ -9,6 +9,7 @@ This code is MIT licensed.
 """
 
 from droid.protocol import DroidCommand
+from droid.beacon import decode_location_beacon_payload
 
 class DroidScripts(object):
     """
@@ -82,6 +83,18 @@ class DroidScriptEngine(object):
         """
 
         await self.send_script_command(script_id, DroidScriptActions.ExecuteScript)
+
+    async def execute_location_beacon_payload(self, payload: str) -> None:
+        """
+        Executes a location beacon on the connected droid emulation what would happen
+        if the droid encountered the beacon at a Disney park
+
+        Args:
+            payload (str): Payload advertised by a park beacon
+        """
+
+        data = decode_location_beacon_payload(payload)
+        await self.execute_script(data['script_id'])
 
     async def stop_script_execution(self) -> None:
         """
