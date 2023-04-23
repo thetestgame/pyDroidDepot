@@ -18,6 +18,7 @@ from droid.audio import DroidAudioController
 from droid.motor import DroidMotorController
 from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
 from droid.voice import DroidVoiceController
+from droid.notify import DroidNotificationProcessor
 from droid.hardware import DisneyManufacturerId, DroidPersonalityIdentifier, DroidAffiliation
 
 class DroidConnection(object):
@@ -60,6 +61,7 @@ class DroidConnection(object):
         self.script_engine = DroidScriptEngine(self)
         self.motor_controller = DroidMotorController(self)
         self.voice_controller = DroidVoiceController(self)
+        self.notify_processor = DroidNotificationProcessor(self)
 
         self.heartbeat_loop = asyncio.new_event_loop()
         self.heartbeat_thread = None
@@ -98,10 +100,11 @@ class DroidConnection(object):
 
     async def notification_handler(self, sender: object, data: bytearray) -> None:
         """
-        Processes notification events from the connected droid
+        Processes notification events from the connected droid and
+        passes it to our notify message processor.
         """
 
-        print("Received notification (%s):" % sender, data.hex())
+        await self.notify_processor.handle_incoming_message(sender, data)
 
     def __start_heartbeat_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         """
@@ -118,7 +121,7 @@ class DroidConnection(object):
         """
 
         while self.droid.is_connected:
-            await self.send_droid_command(DroidCommand.FlashPairingLed, "020001ff01ff0aff00")
+            await self.send_droid_command(DroidCommandId.FlashPairingLed, "020001ff01ff0aff00")
             sleep(10)
 
     async def disconnect(self, silent: bool = False) -> None:
@@ -205,13 +208,13 @@ class DroidConnection(object):
         """
 
         command = "44%s%s" % ("{:02d}".format(command_id), data)
-        await self.send_droid_command(DroidCommand.MultipurposeCommand, command)
+        await self.send_droid_command(DroidCommandId.MultipurposeCommand, command)
 
     async def request_droid_firmware_information(self) -> None:
         """
         """
 
-        await self.send_droid_command(DroidCommand.RetrieveFirmwareInformation)
+        await self.send_droid_command(DroidCommandId.RetrieveFirmwareInformation)
 
 async def discover_droid(retry: bool = False) -> DroidConnection:
     """

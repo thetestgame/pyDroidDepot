@@ -5,7 +5,7 @@ The classes contained in this module are licensed under the MIT License.
 """
 
 from droid.utils import int_to_hex
-from droid.protocol import DroidCommand, DroidMultipurposeCommand
+from droid.protocol import DroidCommandId, DroidMultipurposeCommand
 
 class DroidMotorDirection(object):
     """
@@ -61,7 +61,7 @@ class DroidMotorController(object):
 
         motor_select = "%s%s" % (direction, motor_id)
         motor_command = "%s%s%s%s" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed), delay_hex)
-        await self.droid.send_droid_command(DroidCommand.SetMotorSpeed, motor_command)
+        await self.droid.send_droid_command(DroidCommandId.SetMotorSpeed, motor_command)
 
     async def set_movement_speed(self, direction: int, speed: int = 100, ramp_speed: int = 300) -> None:
         """

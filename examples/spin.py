@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, '../')
 
 from random import randrange
-from droid.connection import discover_droid, DroidCommand
+from droid.connection import discover_droid, DroidCommandId
 from droid.motor import DroidMotorDirection, DroidMotorIdentifier
 from time import sleep
 from bleak import BleakError

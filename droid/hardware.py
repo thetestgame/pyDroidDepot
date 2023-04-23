@@ -5,6 +5,7 @@ This code is MIT licensed.
 """
 
 DisneyManufacturerId = 0x183
+DroidFirmwareVersion = '4b1001444411110100000000'
 
 class DroidAudioBankIdentifier(object):
     """

@@ -12,7 +12,7 @@ import asyncio
 import logging
 from datetime import datetime
 from threading import Thread
-from droid.protocol import DroidCommand
+from droid.protocol import DroidCommandId
 from droid.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 
 class DroidScripts(object):
@@ -83,7 +83,7 @@ class DroidScriptEngine(object):
             raise ValueError("Attempted to use a dangerous script. Execution denied")
 
         command_data = "%s%s" % ("{:02d}".format(script_id), "{:02d}".format(script_action))
-        await self.droid.send_droid_command(DroidCommand.ScriptActionComand, command_data)
+        await self.droid.send_droid_command(DroidCommandId.ScriptActionComand, command_data)
 
     async def execute_script(self, script_id: int) -> None:
         """

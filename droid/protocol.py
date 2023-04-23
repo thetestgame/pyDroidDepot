@@ -1,7 +1,9 @@
 """
-This module defines the DroidCommand and DroidMultipurposeCommand classes used to 
+This module defines the DroidCommandId and DroidMultipurposeCommand classes used to 
 define the constant command identifiers to communicate with a SWGE droid.
 """
+
+from enum import IntEnum
 
 class DroidBluetoothCharacteristics(object):
     """
@@ -11,9 +13,9 @@ class DroidBluetoothCharacteristics(object):
     DroidCommandCharacteristic = '09b600b1-3e42-41fc-b474-e9c0c8f0c801'
     DroidNotifyCharacteristic = '09b600b0-3e42-41fc-b474-e9c0c8f0c801'
 
-class DroidCommand(object):
+class DroidCommandId(IntEnum):
     """
-    A class representing the available droid commands.
+    A enum representing the available droid commands.
 
     Constants:
         RetrieveFirmwareInformation (int): Command to retrieve firmware information.
@@ -36,6 +38,17 @@ class DroidCommand(object):
     ScriptActionComand = 12
     ScriptDelay = 13
     MultipurposeCommand = 15
+
+    RetrieveFirmwareInformationResponse = 129
+    ScriptActionResponse = 128
+
+    @classmethod
+    def valid_command(cls, value: int) -> bool:
+        """
+        Checks if the command id is valid
+        """
+
+        return value in cls._value2member_map_ 
 
 class DroidMultipurposeCommand(object):
     """
