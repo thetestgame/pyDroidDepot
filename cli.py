@@ -48,7 +48,6 @@ async def main() -> None:
     head_leds = [DroidLedIdentifier.RUnitLeftHeadLed, DroidLedIdentifier.RUnitMiddleHeadLed, DroidLedIdentifier.RUnitRightHeadLed]
     try:
         await d.connect()
-        await d.audio_controller.set_volume(0)
         await d.motor_controller.center_head()
 
         while d.droid.is_connected:
@@ -69,6 +68,8 @@ async def main() -> None:
                     await execute_service_command(d.script_engine, service_component_method, service_command_parts)
                 elif service_component_name == "motor":
                     await execute_service_command(d.motor_controller, service_component_method, service_command_parts)
+                elif service_component_name == "voice":
+                    await execute_service_command(d.voice_controller, service_component_method, service_command_parts)
                 else:
                     print('Unknown service component: %s' % service_component_name)
             except ValueError as err:

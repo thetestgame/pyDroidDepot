@@ -17,6 +17,7 @@ from droid.protocol import *
 from droid.audio import DroidAudioController
 from droid.motor import DroidMotorController
 from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
+from droid.voice import DroidVoiceController
 from droid.hardware import DisneyManufacturerId, DroidPersonalityIdentifier, DroidAffiliation
 
 class DroidConnection(object):
@@ -56,6 +57,7 @@ class DroidConnection(object):
         self.audio_controller = DroidAudioController(self)
         self.script_engine = DroidScriptEngine(self)
         self.motor_controller = DroidMotorController(self)
+        self.voice_controller = DroidVoiceController(self)
 
         self.heartbeat_loop = asyncio.new_event_loop()
         self.heartbeat_thread = None
@@ -219,38 +221,35 @@ async def discover_droid(retry: bool = False) -> DroidConnection:
         a DroidConnection object representing the discovered "DROID" Bluetooth device if any. Otherwise None
     """
 
-    discovered_droid = None
     async with BleakScanner() as scanner:      
         await scanner.start()
-
         droids = []
-        while retry and len(droids) == 0:        
+        while True:
             possible_droids = scanner.discovered_devices_and_advertisement_data
             if len(possible_droids) == 0:
-                await asyncio.sleep(5)
+                if not retry:
+                    logging.error("Droid discovery timed out.")
+                    return None
+                else:
+                    logging.warning("Droid discovery timed out. Retrying...")
+                    await asyncio.sleep(5)
+                    continue
 
             for possible_droid_address in possible_droids:
                 ble_device, advertising_data = possible_droids[possible_droid_address]
-                if (ble_device.name == "DROID"):
+                if ble_device.name == "DROID":
                     droids.append((ble_device, advertising_data.manufacturer_data))
 
-            try:      
-                if len(droids) == 0:
-                    if not retry:
-                        logging.error("Droid discovery timed out.")
-                        return
-                    else:
-                        logging.warning("Droid discovery timed out. Retrying...")
-                        continue
-            except BleakError as err:
-                logging.warning("Droid discovery failed. Retrying...")
-                continue
-
-            discovered_droid = droids[0]
-    
-    if discovered_droid is None:
-        return None
-
-    logging.info(f"Droid successfully discovered: [ {discovered_droid[0]} ]")
-    d = DroidConnection(*discovered_droid)
-    return d
+            if len(droids) == 0:
+                if not retry:
+                    logging.error("Droid discovery failed. Retrying...")
+                    await asyncio.sleep(5)
+                    continue
+                else:
+                    logging.warning("Droid discovery failed. Retrying...")
+                    await asyncio.sleep(5)
+                    continue
+            else:
+                discovered_droid = droids[0]
+                logging.info(f"Droid successfully discovered: [ {discovered_droid[0]} ]")
+                return DroidConnection(*discovered_droid)
