@@ -6,6 +6,14 @@ This code is MIT licensed.
 
 from droid.utils import *
 
+class DroidBeaconType(object):
+    """
+    Consants representing the beacon types that SWGE droids respond to.
+    """
+
+    DroidIdentificationBeacon = 3
+    ParkLocationBeacon = 10
+
 class OfficialDroidBeaconLocations(object):
     """
     Constants representing every official Walt Disney World and DisneyLand SWGE Droid Beacon
@@ -27,12 +35,22 @@ class OfficialDroidBeaconLocations(object):
     WDW_DroidDetector =     '0A0405FFA601'
     WDW_InFrontOfOgas =     '0A0407FFA601'
 
+def get_beacon_header(beacon_type: int, data_length: int = 4) -> str:
+    """
+    Returns the header used by a SWGE Beacon
+    """
+
+    return int_to_hex(beacon_type) + int_to_hex(data_length)
+
 def create_location_beacon_payload(script_id: int, reaction_interval: int, signal_strength: int, droid_paired: bool = True) -> str:
     """
     Creates a Location beacon payload for getting an area based reaction out of a SWGE droid
     """
 
-    beacon_payload = "0A04"
+    if script_id < 1 or script_id > 7:
+        raise ValueError('Script ids outside of the range of 1-7 are not currently supported.')
+
+    beacon_payload = get_beacon_header(DroidBeaconType.ParkLocationBeacon, 4)
     beacon_payload += int_to_hex(script_id)
     beacon_payload += int_to_hex(reaction_interval)
     beacon_payload += dbm_to_hex(signal_strength)
@@ -57,10 +75,12 @@ def create_droid_beacon_payload(droid_paired: bool = True, affiliation_id: int =
     Creates a droid beacon payload for a droid given its paired state, affilitation id, and personality id
     """
 
+    header = get_beacon_header(DroidBeaconType.DroidIdentificationBeacon, 4)
     droid_paired_byte = 0x80 + int(droid_paired)
     affiliation_byte = (affiliation_id * 2) + 0x80
     personality_byte = personality_id
-    hex_string = f"030444{droid_paired_byte:02X}{affiliation_byte:02X}{personality_byte:02X}"
+    hex_string = f"{header}44{droid_paired_byte:02X}{affiliation_byte:02X}{personality_byte:02X}"
+
     return hex_string
 
 def decode_droid_beacon_payload(payload: str) -> dict:
