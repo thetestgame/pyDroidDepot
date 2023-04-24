@@ -7,11 +7,12 @@ This module defines classes for controlling audio and LEDs for a droid. It conta
 This code is MIT licensed.
 """
 
+from enum import IntEnum
 from droid.utils import  int_to_hex
 from droid.protocol import DroidMultipurposeCommand, DroidAffiliation
 from droid.hardware import DroidLedIdentifier, get_shutdown_audio_track
 
-class DroidAudioCommand(object):
+class DroidAudioCommand(IntEnum):
     """
     A collection of audio commands for a droid.
 
@@ -55,6 +56,27 @@ class DroidAudioCommand(object):
     DisableHeadLeds = 74
     EnableHeadLeds = 75
 
+class DroidLedIdentifier(object):
+    """
+    Constants relating to various Leds found in droid depot droids.
+    """
+
+    # BD Head Leds. These Leds are RGB. 
+    # To change the RGB values set the values as follows base (blue), base + 1 (green), base + 2 (red)
+    BDUnitLedZero = 0
+    BDUnitLedOne = 3
+    BDUnitLedTwo = 6
+    BDUnitLedThree = 9 
+    BDUnitLeftEye = 12
+    bdUnitRightEye = 13
+
+    RUnitLeftHeadLed = 1
+    RUnitMiddleHeadLed = 2
+    RUnitRightHeadLed = 4
+    RUnitLeftAccessory = 8
+    RUnitRightAccessory = 16
+
+    BBUnitHeadLed = 1
 
 class DroidAudioController(object):
     """
