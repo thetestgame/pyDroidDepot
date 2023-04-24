@@ -11,8 +11,8 @@ This class is licensed under MIT.
 
 import logging
 from droid.utils import hex_to_int
-from droid.protocol import DroidCommandId
 from droid.hardware import DroidFirmwareVersion
+from droid.protocol import *
 
 class DroidNotifyMessage(object):
     """
@@ -124,8 +124,10 @@ class DroidNotificationProcessor(object):
         
         if message.command_id == DroidCommandId.RetrieveFirmwareInformationResponse:
             await self.__verify_firmware_version(message)
+        elif message.command_id == DroidCommandId.RUnitHeadEvent:
+            await self.__handle_runit_head_motor_events(message)
         else:
-            logging.warning('No handler present for droid command: %s' % DroidCommandId(message.command_id).name)
+            logging.warning('No handler present for droid command: %s (%s)' % (DroidCommandId(message.command_id).name, message.message_data))
 
     async def __verify_firmware_version(self, message: DroidNotifyMessage) -> None:
         """
@@ -134,3 +136,12 @@ class DroidNotificationProcessor(object):
 
         if message.message_data != DroidFirmwareVersion:
             raise Exception('Possibly incomaptible droid detected. Possibly a new firmware version.')
+        
+    async def __handle_runit_head_motor_events(self, message):
+        """
+        """
+
+        unknown1 = hex_to_int(message.message_data[:2])
+        event_id = hex_to_int(message.message_data[2:4])
+
+        await self.droid.motor_controller.process_runit_head_motor_event(event_id)

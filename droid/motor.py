@@ -4,6 +4,7 @@ This module provides classes for controlling the motor functions of a SWGE Droid
 The classes contained in this module are licensed under the MIT License.
 """
 
+from enum import IntEnum
 from droid.utils import int_to_hex
 from droid.protocol import DroidCommandId, DroidMultipurposeCommand
 
@@ -18,7 +19,7 @@ class DroidMotorDirection(object):
     Left = 0
     Right = 8
 
-class DroidMotorIdentifier(object):
+class DroidMotorIdentifier(IntEnum):
     """
     Enumeration of motor identifiers.
     """
@@ -26,6 +27,17 @@ class DroidMotorIdentifier(object):
     LeftMotor = 0
     RightMotor = 1
     HeadMotor = 2
+
+class DroidMotorEvent(IntEnum):
+    """
+    """
+
+    MotorStarted = 2
+    MotorMovingRight = 3
+    MotorMovingLeft = 4
+    MotorStopped = 130
+    MotorHitLeftLimit = 131
+    MotorHitRightLimit = 132
 
 class DroidMotorController(object):
     """
@@ -41,7 +53,30 @@ class DroidMotorController(object):
         """
 
         self.droid = droid
+        self.__motor_event_handlers = []
 
+    def subscribe_runit_head_motor_events(self, handler: object) -> None:
+        """
+        """
+
+        if handler not in self.__motor_event_handlers:
+            self.__motor_event_handlers.append(handler)
+
+    def unsubscribe_runit_head_motor_events(self, handler: object) -> None:
+        """
+
+        """
+
+        if handler in self.__motor_event_handlers:
+            self.__motor_event_handlers.remove(handler)
+
+    async def process_runit_head_motor_event(self, event_id: int) -> None:
+        """
+        """
+
+        for handler in self.__motor_event_handlers:
+            handler(DroidMotorEvent(event_id))
+    
     async def send_motor_speed_command(self, direction: int, motor_id: int, speed: int = 160, ramp_speed: int = 300, delay = 0) -> None:
         """
         Sends a motor speed command to the droid.
@@ -59,7 +94,7 @@ class DroidMotorController(object):
             for x in range(missing):
                 delay_hex = '0' + delay_hex
 
-        motor_select = "%s%s" % (direction, motor_id)
+        motor_select = "%s%d" % (direction, motor_id)
         motor_command = "%s%s%s%s" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed), delay_hex)
         await self.droid.send_droid_command(DroidCommandId.SetMotorSpeed, motor_command)
 
@@ -109,3 +144,17 @@ class DroidMotorController(object):
 
         command_data = "%s%s" % (int_to_hex(speed), int_to_hex(offset))
         await self.droid.send_droid_multi_command(DroidMultipurposeCommand.CenterRUnitHead, command_data)
+
+    #02
+    #03
+    #82
+    #02
+    #84 
+    #82
+
+    #02
+    #04
+    #82
+    #02
+    #83
+    #82

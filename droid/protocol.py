@@ -47,8 +47,8 @@ class DroidCommandId(IntEnum):
     ScriptDelay = 13
     MultipurposeCommand = 15
 
+    RUnitHeadEvent = 128
     RetrieveFirmwareInformationResponse = 129
-    UnknownMotorMovedResponse = 128
 
     @classmethod
     def valid_command(cls, value: int) -> bool:
