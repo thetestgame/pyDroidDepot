@@ -212,6 +212,9 @@ class DroidConnection(object):
 
     async def request_droid_firmware_information(self) -> None:
         """
+        Requests the droid firmware information. Currently the response is just auto
+        confirmed inside the droid.notify module. Once this information is properly
+        decoded a return to this method could be added to provide useful information.
         """
 
         await self.send_droid_command(DroidCommandId.RetrieveFirmwareInformation)
