@@ -1,6 +1,9 @@
 """
 """
 
+import sys
+sys.path.insert(0, '../')
+
 from droid.connection import discover_droid, DroidCommandId
 from droid.audio import DroidLedIdentifier
 from time import sleep
