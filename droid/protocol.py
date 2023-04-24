@@ -5,6 +5,14 @@ define the constant command identifiers to communicate with a SWGE droid.
 
 from enum import IntEnum
 
+class DisneyBLEManufacturerId(object):
+    """
+    Constants representing the types of BLE beacons found in Disney parks.
+    """
+
+    DisneyiBeacon = 76
+    DroidManufacturerId = 387
+
 class DroidBluetoothCharacteristics(object):
     """
     a constants class representing the characteristics available on droid depot droids
@@ -40,7 +48,7 @@ class DroidCommandId(IntEnum):
     MultipurposeCommand = 15
 
     RetrieveFirmwareInformationResponse = 129
-    ScriptActionResponse = 128
+    UnknownMotorMovedResponse = 128
 
     @classmethod
     def valid_command(cls, value: int) -> bool:

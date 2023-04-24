@@ -76,6 +76,8 @@ async def main() -> None:
                     print('Unknown service component: %s' % service_component_name)
             except ValueError as err:
                 print(err)
+            except SyntaxError as err:
+                print('Invalid arguments. Check your inputs')
         
     except OSError as err:
         print(f"Discovery failed due to operating system: {err}")

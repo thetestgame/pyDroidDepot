@@ -19,7 +19,7 @@ from droid.motor import DroidMotorController
 from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
 from droid.voice import DroidVoiceController
 from droid.notify import DroidNotificationProcessor
-from droid.hardware import DisneyManufacturerId, DroidPersonalityIdentifier, DroidAffiliation
+from droid.hardware import DroidPersonalityIdentifier, DroidAffiliation
 
 class DroidConnection(object):
     """
@@ -84,7 +84,7 @@ class DroidConnection(object):
         await self.droid.write_gatt_char(0x000d, connect_code, False)
         await self.droid.write_gatt_char(0x000d, connect_code, False)
 
-        droid_data = self.manufacturer_data[DisneyManufacturerId]
+        droid_data = self.manufacturer_data[DisneyBLEManufacturerId.DroidManufacturerId]
 
         droid_data_len = len(droid_data)
         self.personality_id = droid_data[droid_data_len - 1]
@@ -247,7 +247,7 @@ async def discover_droid(retry: bool = False) -> DroidConnection:
                 ble_device, advertising_data = possible_droids[possible_droid_address]
                 if ble_device.name == "DROID":
                     droids.append((ble_device, advertising_data.manufacturer_data))
-
+                    
             if len(droids) == 0:
                 if not retry:
                     logging.error("Droid discovery failed. Retrying...")

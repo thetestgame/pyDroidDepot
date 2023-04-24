@@ -5,18 +5,11 @@ This code is MIT licensed.
 """
 
 from droid.utils import *
+from droid.protocol import DisneyBLEManufacturerId
 from bleak import BleakScanner
 from threading import Thread
 import logging
 import asyncio
-
-class DisneyBLEBeaconType(object):
-    """
-    Constants representing the types of BLE beacons found in Disney parks.
-    """
-
-    DisneyiBeacon = 76
-    DroidReactionBeacon = 387
 
 class DroidBeaconType(object):
     """
@@ -169,7 +162,7 @@ class DroidReactionBeaconScanner(object):
                         # Check if the device is advertising with the expected manufacturer ID
                         device, data = devices[device_address]
                         if self.__is_droid_beacon(data.manufacturer_data):
-                            beacon_payload = data.manufacturer_data[DisneyBLEBeaconType.DroidReactionBeacon]
+                            beacon_payload = data.manufacturer_data[DisneyBLEManufacturerId.DroidManufacturerId]
                             beacon_payload = beacon_payload.hex()
 
                             # Decode the beacon data based on type
@@ -208,7 +201,7 @@ class DroidReactionBeaconScanner(object):
         Checks if the given data contains data can a droid can react to.
         """
 
-        return DisneyBLEBeaconType.DroidReactionBeacon in data
+        return DisneyBLEManufacturerId.DroidManufacturerId in data
 
     def start(self) -> None:
         """
@@ -218,8 +211,8 @@ class DroidReactionBeaconScanner(object):
         if self.__scan_loop.is_running():
             return
 
-        self.heartbeat_thread = Thread(target=self.__start_scan_loop, args=(self.__scan_loop,), daemon=True)
-        self.heartbeat_thread.start()
+        self.__scan_thread = Thread(target=self.__start_scan_loop, args=(self.__scan_loop,), daemon=True)
+        self.__scan_thread.start()
         asyncio.run_coroutine_threadsafe(self.__scan(), self.__scan_loop)
 
     def stop(self) -> None:
