@@ -54,7 +54,6 @@ class DroidScriptEngine(object):
 
         Args:
             droid (object): The droid instance to use.
-
         """
 
         self.droid = droid
@@ -135,6 +134,9 @@ class DroidScriptEngine(object):
     def __calculate_reaction_time(self, interval: int) -> int:
         """
         Calculates the time in seconds from a park beacon's reaction interval.
+
+        Args:
+            interval (int): Reaction interval received from a location beacon
         """
 
         interval = interval * 5
@@ -145,6 +147,13 @@ class DroidScriptEngine(object):
 
     async def __perform_droid_location_reactions(self, locations: list) -> None:
         """
+        Executes a script associated with each park location beacon that the droid enters.
+
+        Args:
+            locations (list): A list of location beacon addresses to react to
+
+        Returns:
+            int: The calculated reaction time in seconds.
         """
 
         # Verify we have at least one location to react to first.
