@@ -10,6 +10,7 @@ This class is licensed under MIT.
 """
 
 import logging
+import asyncio
 from droid.utils import hex_to_int
 from droid.hardware import DroidFirmwareVersion
 from droid.protocol import *
@@ -72,6 +73,34 @@ class DroidNotificationProcessor(object):
         """
 
         self.droid = droid
+        self.__pending_callback_events = {}
+
+    async def wait_for_command_response(self, command_id: int, timeout = 1.0) -> object:
+        """
+        Waits for a command response from the droid's microcontroller.
+
+        Args:
+            command_id (int): The command id to expect as a response
+            timeout (float): The maximum time to wait for a response, in seconds.
+
+        Raises:
+            TimeoutError: If a response is not received within the specified timeout.
+
+        Returns:
+            An object representing the response to the given command, or None if no response is received within the specified timeout.
+        """
+
+        # Queue our callback Queue for handling
+        callback_queue = asyncio.Queue()
+        if command_id not in self.__pending_callback_events:
+            self.__pending_callback_events[command_id] = []
+        self.__pending_callback_events[command_id].append(callback_queue)
+
+        # Wait for our response from the droid
+        try:
+            return await asyncio.wait_for(callback_queue.get(), timeout=timeout)
+        except asyncio.TimeoutError:
+            return None
 
     def decode_notify_message(self, data: bytearray) -> DroidNotifyMessage:
         """
@@ -112,33 +141,71 @@ class DroidNotificationProcessor(object):
             logging.error('Failed to process notification message with data %s. Data is malformed' % (data.hex()))
             logging.error(e, exc_info=True)
 
+    async def __handle_pending_callbacks(self, message: DroidNotifyMessage, response: object) -> None:
+        """
+        Handles any pending callbacks registered for the given command ID.
+
+        Args:
+            message (DroidNotifyMessage): The notification message received from the droid.
+            response (object): The response object to be passed to the callbacks.
+        """
+
+        if message.command_id not in self.__pending_callback_events:
+            return
+        
+        command_id = message.command_id
+        if not len(self.__pending_callback_events[command_id]):
+            return
+        
+        first_callback_event = self.__pending_callback_events[command_id][0]
+        await first_callback_event.put(response)
+        self.__pending_callback_events[command_id].remove(first_callback_event)
+
     async def __process_incoming_message(self, message: DroidNotifyMessage) -> None:
         """
-        Processes the parsed command message from the connected droid passing it
-        to the available command handlers.
+        Processes the parsed command message from the connected droid and passes it
+        to the appropriate command handler.
+
+        Args:
+            message (DroidNotifyMessage): The parsed command message received from the droid.
         """
 
         if not DroidCommandId.valid_command(message.command_id):
             logging.warning('Received unknown command %s. Ignoring' % message.command_id)
             return
         
+        response = None
         if message.command_id == DroidCommandId.RetrieveFirmwareInformationResponse:
-            await self.__verify_firmware_version(message)
+            response = await self.__verify_firmware_version(message)
         elif message.command_id == DroidCommandId.RUnitHeadEvent:
-            await self.__handle_runit_head_motor_events(message)
+            response = await self.__handle_runit_head_motor_events(message)
         else:
             logging.warning('No handler present for droid command: %s (%s)' % (DroidCommandId(message.command_id).name, message.message_data))
 
+        if response == None:
+            response = message.message_data
+        await self.__handle_pending_callbacks(message, response)
+
     async def __verify_firmware_version(self, message: DroidNotifyMessage) -> None:
         """
-        Checks if the firmware version received from our droid matches the expected firmware version
+        Verifies that the firmware version received from the connected droid matches the expected firmware version.
+
+        Args:
+            message (DroidNotifyMessage): The parsed command message received from the droid.
+
+        Raises:
+            Exception: If the firmware version received does not match the expected firmware version.
         """
 
         if message.message_data != DroidFirmwareVersion:
             raise Exception('Possibly incomaptible droid detected. Possibly a new firmware version.')
         
-    async def __handle_runit_head_motor_events(self, message):
+    async def __handle_runit_head_motor_events(self, message: DroidNotifyMessage) -> None:
         """
+        Handles R unit head motor events received from the connected droid.
+
+        Args:
+            message (DroidNotifyMessage): The parsed command message received from the droid.
         """
 
         unknown1 = hex_to_int(message.message_data[:2])

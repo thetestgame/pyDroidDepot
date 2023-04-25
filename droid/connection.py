@@ -210,14 +210,18 @@ class DroidConnection(object):
         command = "44%s%s" % ("{:02d}".format(command_id), data)
         await self.send_droid_command(DroidCommandId.MultipurposeCommand, command)
 
-    async def request_droid_firmware_information(self) -> None:
+    async def get_droid_firmware_information(self) -> None:
         """
-        Requests the droid firmware information. Currently the response is just auto
-        confirmed inside the droid.notify module. Once this information is properly
-        decoded a return to this method could be added to provide useful information.
+        Requests the droid firmware information. Currently the contents of this data
+        is unknown. Because of this this request only returns the raw data processed by the 
+        notify command processor.
         """
 
         await self.send_droid_command(DroidCommandId.RetrieveFirmwareInformation)
+        firemware_information = await self.notify_processor.wait_for_command_response(DroidCommandId.RetrieveFirmwareInformationResponse)
+        if firemware_information == None:
+            raise Exception('Failed to retrieve firmware information. No response given')
+        return firemware_information
 
     async def set_pairing_led(self, state: bool) -> None:
         """
@@ -247,10 +251,12 @@ class DroidConnection(object):
     async def flash_pairing_led(self, data: str) -> None:
         """
         Flashes the droids onboard pairing led. Currently the data required for this command has not been decoded. 
+
+        An example piece of encoded data is "020001ff01ff0aff00". This hex encoded string will flash the pairing LED 10 times at 
+        a rate of once per second.
         """
 
-        #TODO: decode the data into arguments
-        await self.send_droid_command(DroidCommandId.FlashPairingLed, data) 
+        await self.send_droid_command(DroidCommandId.FlashPairingLed, data)
 
 async def discover_droids(retry: bool = False) -> list:
     """

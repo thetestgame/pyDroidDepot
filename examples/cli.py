@@ -35,10 +35,14 @@ async def execute_service_command(service_component: object, func_name: str, arg
         cast_arg = cast_argument(arg, arg_type)
         args.append(cast_arg)
 
+    result = None
     if inspect.iscoroutinefunction(func_inst):
-        await func_inst(*args)
+        result = await func_inst(*args)
     else:
-        func_inst(*args)
+        result = func_inst(*args)
+
+    if result != None:
+        print(result)
 
 def get_service_command_args(input_list: list) -> list:
     if len(input_list) > 2:
