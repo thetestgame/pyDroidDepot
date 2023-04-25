@@ -257,6 +257,12 @@ async def discover_droids(retry: bool = False) -> list:
     Scans for nearby Bluetooth devices manufactured by Disney and have the device name of "DROID" if any are found they will be
     converted to a DroidConnection and added to a list to return. If retry is False, the function will out after a set
     period of time and return without discovering any droids.
+
+    Args:
+        retry (bool): whether or not to continue scanning until a device is found or the function is interrupted
+
+    Returns:
+        a list of DroidConnection objects representing the discovered "DROID" Bluetooth devices if any. Otherwise an empty list
     """
 
     async with BleakScanner() as scanner:      
