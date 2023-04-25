@@ -35,3 +35,7 @@ PyDroidDepot comes with a few examples to help users get started. These examples
 
 ## License
 PyDroidDepot is released under the MIT license. See the LICENSE file for more details.
+
+## Disclaimer
+
+PyDroidDepot is an open-source project created and maintained by independent developers, and is not affiliated with or endorsed by Disney, Lucasfilm, or any of their subsidiaries or affiliated companies. Star Wars and all related properties, characters, names, and indicia are trademarks of Lucasfilm Ltd. and/or its affiliates. The use of such material is protected under fair use laws and regulations.
