@@ -11,7 +11,6 @@ This code is MIT licensed.
 import asyncio
 import logging
 from datetime import datetime
-from threading import Thread
 from droiddepot.protocol import DroidCommandId
 from droiddepot.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 

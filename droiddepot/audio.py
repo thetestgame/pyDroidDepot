@@ -68,7 +68,7 @@ class DroidLedIdentifier(object):
     BDUnitLedTwo = 6
     BDUnitLedThree = 9 
     BDUnitLeftEye = 12
-    bdUnitRightEye = 13
+    BDUnitRightEye = 13
 
     RUnitLeftHeadLed = 1
     RUnitMiddleHeadLed = 2
