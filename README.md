@@ -13,7 +13,7 @@ PyDroidDepot can be installed using `pip`, or by downloading the source code and
 To install PyDroidDepot using `pip`, simply run:
 
 ```
-pip install pydroid
+pip install pydroiddepot
 ```
 
 ### Installing from source
