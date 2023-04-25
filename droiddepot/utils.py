@@ -1,5 +1,5 @@
 """
-Utility methods module for PyDroid. 
+Utility methods module for PyDroidDepot. 
 
 This code is MIT licensed.
 """

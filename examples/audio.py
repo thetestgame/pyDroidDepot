@@ -16,8 +16,8 @@ import sys
 sys.path.insert(0, '../')
 
 from random import randrange
-from droid.connection import discover_droid, DroidCommandId
-from droid.script import DroidScripts
+from droiddepot.connection import discover_droid, DroidCommandId
+from droiddepot.script import DroidScripts
 from time import sleep
 from bleak import BleakError
 import asyncio

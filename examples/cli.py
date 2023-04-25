@@ -4,8 +4,8 @@
 import sys
 sys.path.insert(0, '../')
 
-from droid.connection import discover_droid, DroidCommandId
-from droid.audio import DroidLedIdentifier
+from droiddepot.connection import discover_droid, DroidCommandId
+from droiddepot.audio import DroidLedIdentifier
 from time import sleep
 from bleak import BleakError
 import asyncio

@@ -12,7 +12,7 @@ based around the tone supplied when invoked.
 This code is MIT licensed.
 """
 
-from droid.hardware import DroidAffiliation, DroidAudioBankIdentifier
+from droiddepot.hardware import DroidAffiliation, DroidAudioBankIdentifier
 import random
 
 class DroidVoiceTone(object):

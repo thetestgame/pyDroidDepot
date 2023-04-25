@@ -13,13 +13,13 @@ import logging
 from time import sleep
 from threading import Thread
 from bleak import BleakScanner, BleakClient
-from droid.protocol import *
-from droid.audio import DroidAudioController
-from droid.motor import DroidMotorController
-from droid.script import DroidScriptEngine, DroidScripts
-from droid.voice import DroidVoiceController
-from droid.notify import DroidNotificationProcessor
-from droid.hardware import DroidPersonalityIdentifier, DroidAffiliation
+from droiddepot.protocol import *
+from droiddepot.audio import DroidAudioController
+from droiddepot.motor import DroidMotorController
+from droiddepot.script import DroidScriptEngine, DroidScripts
+from droiddepot.voice import DroidVoiceController
+from droiddepot.notify import DroidNotificationProcessor
+from droiddepot.hardware import DroidPersonalityIdentifier, DroidAffiliation
 
 class DroidConnection(object):
     """
@@ -131,7 +131,7 @@ class DroidConnection(object):
         if not self.droid.is_connected:
             return
 
-        logging.info("Disconnecting from droid")
+        logging.info("Disconnecting from droiddepot")
         try:
             if not silent:
                 await self.audio_controller.play_shutdown_audio()

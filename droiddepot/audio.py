@@ -8,9 +8,9 @@ This code is MIT licensed.
 """
 
 from enum import IntEnum
-from droid.utils import  int_to_hex
-from droid.protocol import DroidMultipurposeCommand, DroidAffiliation
-from droid.hardware import DroidLedIdentifier, get_shutdown_audio_track
+from droiddepot.utils import  int_to_hex
+from droiddepot.protocol import DroidMultipurposeCommand, DroidAffiliation
+from droiddepot.hardware import DroidLedIdentifier, get_shutdown_audio_track
 
 class DroidAudioCommand(IntEnum):
     """

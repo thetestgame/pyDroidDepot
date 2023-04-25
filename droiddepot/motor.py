@@ -5,8 +5,8 @@ The classes contained in this module are licensed under the MIT License.
 """
 
 from enum import IntEnum
-from droid.utils import int_to_hex
-from droid.protocol import DroidCommandId, DroidMultipurposeCommand
+from droiddepot.utils import int_to_hex
+from droiddepot.protocol import DroidCommandId, DroidMultipurposeCommand
 
 class DroidMotorDirection(object):
     """

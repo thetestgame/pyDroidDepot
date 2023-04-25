@@ -4,8 +4,8 @@ Module for working with SWGE Beacon data and emulating park beacons
 This code is MIT licensed.
 """
 
-from droid.utils import *
-from droid.protocol import DisneyBLEManufacturerId
+from droiddepot.utils import *
+from droiddepot.protocol import DisneyBLEManufacturerId
 from bleak import BleakScanner
 from threading import Thread
 import logging

@@ -12,8 +12,8 @@ import asyncio
 import logging
 from datetime import datetime
 from threading import Thread
-from droid.protocol import DroidCommandId
-from droid.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
+from droiddepot.protocol import DroidCommandId
+from droiddepot.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 
 class DroidScripts(object):
     """

@@ -11,9 +11,9 @@ This class is licensed under MIT.
 
 import logging
 import asyncio
-from droid.utils import hex_to_int
-from droid.hardware import DroidFirmwareVersion
-from droid.protocol import *
+from droiddepot.utils import hex_to_int
+from droiddepot.hardware import DroidFirmwareVersion
+from droiddepot.protocol import *
 
 class DroidNotifyMessage(object):
     """
