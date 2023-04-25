@@ -115,6 +115,9 @@ class DroidScriptEngine(object):
             script_id (int): The ID of the script to open for writing.
         """
 
+        if script_id <= 0:
+            raise ValueError('Script ids must be larger then 0')
+
         if script_id >= 1 and script_id <= 13:
             raise ValueError("Attempted to rewrite Disney programmed scripts. Action prevented for safety")
 
