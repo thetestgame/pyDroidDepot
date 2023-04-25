@@ -12,11 +12,11 @@ import asyncio
 import logging
 from time import sleep
 from threading import Thread
-from bleak import BleakScanner, BleakClient, BleakError, AdvertisementData
+from bleak import BleakScanner, BleakClient
 from droid.protocol import *
 from droid.audio import DroidAudioController
 from droid.motor import DroidMotorController
-from droid.script import DroidScriptEngine, DroidScriptActions, DroidScripts
+from droid.script import DroidScriptEngine, DroidScripts
 from droid.voice import DroidVoiceController
 from droid.notify import DroidNotificationProcessor
 from droid.hardware import DroidPersonalityIdentifier, DroidAffiliation
@@ -116,12 +116,11 @@ class DroidConnection(object):
 
     async def __send_heartbeat_command(self) -> None:
         """
-        Sends our flash pairing led command to the droid. This command is used as both a connection status indicator as well
-        as keeps our connection alive.
+        Sends a harmless unused command every 10 seconds to keep our connection to the droid alive even when not in use.
         """
 
         while self.droid.is_connected:
-            await self.send_droid_command(DroidCommandId.FlashPairingLed, "020001ff01ff0aff00")
+            await self.send_droid_command(DroidCommandId.ConnectionHeartbeat)
             sleep(10)
 
     async def disconnect(self, silent: bool = False) -> None:
@@ -194,6 +193,7 @@ class DroidConnection(object):
         """
 
         command = self.build_droid_command(command_id, data)
+        logging.debug('Sending command: %s' % command.hex())
         await self.droid.write_gatt_char(DroidBluetoothCharacteristics.DroidCommandCharacteristic, bytearray.fromhex(command.hex()))
 
     async def send_droid_multi_command(self, command_id: int, data: str = "") -> None:
@@ -219,36 +219,63 @@ class DroidConnection(object):
 
         await self.send_droid_command(DroidCommandId.RetrieveFirmwareInformation)
 
-async def discover_droid(retry: bool = False) -> DroidConnection:
+    async def set_pairing_led(self, state: bool) -> None:
+        """
+        Sets the active state of the droid's pairing led.
+
+        Args:
+            state (bool): State to set the led to
+        """
+
+        data = "00"
+        data += "ff" if state else "00"
+        await self.send_droid_command(DroidCommandId.SetPairingLedState, data)
+
+    async def set_rgb_led(self, state: bool) -> None:
+        """
+        Sets the active state of the droid's onboard RGB led. Currently no droids exist that use this feature
+        however its added for completeness.
+
+        Args:
+            state (bool): State to set the led to
+        """
+
+        data = "00"
+        data += "ff" if state else "00"
+        await self.send_droid_command(DroidCommandId.SetRGBLedState, data)
+
+    async def flash_pairing_led(self, data: str) -> None:
+        """
+        Flashes the droids onboard pairing led. Currently the data required for this command has not been decoded. 
+        """
+
+        #TODO: decode the data into arguments
+        await self.send_droid_command(DroidCommandId.FlashPairingLed, data) 
+
+async def discover_droids(retry: bool = False) -> list:
     """
-    Scans for nearby Bluetooth devices until a device named "DROID" is found. If retry is True, the function will
-    continue scanning until it finds a device or is interrupted. If retry is False, the function will time out after a
-    set period of time and return without discovering a device.
-
-    Args:
-        retry (bool): whether or not to continue scanning until a device is found or the function is interrupted
-
-    Returns:
-        a DroidConnection object representing the discovered "DROID" Bluetooth device if any. Otherwise None
+    Scans for nearby Bluetooth devices manufactured by Disney and have the device name of "DROID" if any are found they will be
+    converted to a DroidConnection and added to a list to return. If retry is False, the function will out after a set
+    period of time and return without discovering any droids.
     """
 
     async with BleakScanner() as scanner:      
         await scanner.start()
+
+        droid_connections = []
+
         droids = []
         while True:
             possible_droids = scanner.discovered_devices_and_advertisement_data
             if len(possible_droids) == 0:
-                if not retry:
-                    logging.error("Droid discovery timed out.")
-                    return None
-                else:
-                    logging.warning("Droid discovery timed out. Retrying...")
-                    await asyncio.sleep(5)
-                    continue
+                await asyncio.sleep(5)
+                continue
 
             for possible_droid_address in possible_droids:
                 ble_device, advertising_data = possible_droids[possible_droid_address]
-                if ble_device.name == "DROID":
+                manufacturer_ids = list(advertising_data.manufacturer_data.keys()) if advertising_data.manufacturer_data != None else []
+
+                if ble_device.name == "DROID" and DisneyBLEManufacturerId.DroidManufacturerId in manufacturer_ids:
                     droids.append((ble_device, advertising_data.manufacturer_data))
                     
             if len(droids) == 0:
@@ -261,6 +288,25 @@ async def discover_droid(retry: bool = False) -> DroidConnection:
                     await asyncio.sleep(5)
                     continue
             else:
-                discovered_droid = droids[0]
-                logging.info(f"Droid successfully discovered: [ {discovered_droid[0]} ]")
-                return DroidConnection(*discovered_droid)
+                for discovered_droid in droids:
+                    logging.info(f"Droid successfully discovered: [ {discovered_droid[0]} ]")
+                    droid_connections.append(DroidConnection(*discovered_droid))
+                break
+    
+    return droid_connections
+
+async def discover_droid(retry: bool = False) -> DroidConnection:
+    """
+    Scans for nearby Bluetooth devices manufactured by Disney and have the device name of "DROID" and returns if found. If retry is True, the function will
+    continue scanning until it finds a device or is interrupted. If retry is False, the function will time out after a
+    set period of time and return without discovering a device.
+
+    Args:
+        retry (bool): whether or not to continue scanning until a device is found or the function is interrupted
+
+    Returns:
+        a DroidConnection object representing the discovered "DROID" Bluetooth device if any. Otherwise None
+    """
+
+    discovered_droids = await discover_droids(retry)
+    return None if len(discovered_droids) == 0 else discovered_droids[0]

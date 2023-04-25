@@ -45,6 +45,7 @@ class DroidCommandId(IntEnum):
     ScriptWriteCommand = 6
     ScriptActionComand = 12
     ScriptDelay = 13
+    ConnectionHeartbeat = 14
     MultipurposeCommand = 15
 
     RUnitHeadEvent = 128
