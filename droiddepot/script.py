@@ -11,7 +11,7 @@ This code is MIT licensed.
 import asyncio
 import logging
 from datetime import datetime
-from droiddepot.protocol import DroidCommandId
+from droiddepot.protocol import DroidCommandId, protocol_action
 from droiddepot.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 
 class DroidScripts(object):
@@ -83,6 +83,7 @@ class DroidScriptEngine(object):
         command_data = "%s%s" % ("{:02d}".format(script_id), "{:02d}".format(script_action))
         await self.droid.send_droid_command(DroidCommandId.ScriptActionComand, command_data)
 
+    @protocol_action
     async def execute_script(self, script_id: int) -> None:
         """
         Executes a droid script.
@@ -93,6 +94,7 @@ class DroidScriptEngine(object):
 
         await self.send_script_command(script_id, DroidScriptActions.ExecuteScript)
 
+    @protocol_action
     async def execute_location_beacon_payload(self, payload: str) -> None:
         """
         Executes a location beacon on the connected droid emulation what would happen
