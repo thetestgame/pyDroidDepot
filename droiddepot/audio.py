@@ -9,7 +9,7 @@ This code is MIT licensed.
 
 from enum import IntEnum
 from droiddepot.utils import  int_to_hex
-from droiddepot.protocol import DroidMultipurposeCommand, DroidAffiliation
+from droiddepot.protocol import DroidMultipurposeCommand, DroidAffiliation, protocol_action
 from droiddepot.hardware import DroidLedIdentifier, get_shutdown_audio_track
 
 class DroidAudioCommand(IntEnum):
@@ -99,6 +99,7 @@ class DroidAudioController(object):
         self.disabled_leds = []
         self.turned_on_leds = []
 
+    @protocol_action
     async def execute_audio_command(self, command_id: int, data: str = "00") -> None:
         """
         Executes an audio command on the Droid.
@@ -114,7 +115,8 @@ class DroidAudioController(object):
         command_id = int_to_hex(command_id)
         command_data = "%s%s"  % (command_id, data)
         await self.droid.send_droid_multi_command(DroidMultipurposeCommand.AudioControllerCommand, command_data)
-
+    
+    @protocol_action
     async def play_audio(self, sound_id: int = None, bank_id: int = None, cycle: bool = False, volume: int = None) -> None:
         """
         Plays audio on the Droid.
@@ -153,6 +155,7 @@ class DroidAudioController(object):
         
         await self.execute_audio_command(audio_command, audio_parameter)
 
+    @protocol_action
     async def play_shutdown_audio(self) -> None:
         """
         Plays the droid's shutdown audio based on its configured personality id
@@ -161,6 +164,7 @@ class DroidAudioController(object):
         bank_id, sound_id = get_shutdown_audio_track(self.droid.personality_id)
         await self.play_audio(sound_id=sound_id, bank_id=bank_id, cycle=True)
 
+    @protocol_action
     async def set_audio_bank(self, bank_id: int) -> None:
         """
         Sets the selected audio bank on the Droid.
@@ -174,6 +178,7 @@ class DroidAudioController(object):
 
         await self.execute_audio_command(DroidAudioCommand.SetSelectedSoundBank, bank_id)
 
+    @protocol_action
     async def set_volume(self, volume_level: int) -> None:
         """
         Sets the volume of the audio playback on the Droid.
@@ -185,12 +190,14 @@ class DroidAudioController(object):
         volume_level = int_to_hex(volume_level if volume_level != None else 0)
         await self.execute_audio_command(DroidAudioCommand.SetVolume, volume_level)
 
+    @protocol_action
     async def reset_head_leds(self) -> None:
         """
         """
 
         await self.enable_head_led(31)
 
+    @protocol_action
     async def disable_head_led(self, led_identifier: int) -> None:
         """
         """
@@ -200,6 +207,7 @@ class DroidAudioController(object):
         if led_identifier not in self.disabled_leds:
             self.disabled_leds.append(led_identifier)
 
+    @protocol_action
     async def enable_head_led(self, led_identifier: int) -> None:
         """
         """
@@ -210,6 +218,7 @@ class DroidAudioController(object):
         if led_identifier in self.disabled_leds:
             self.disabled_leds.remove(led_identifier)
 
+    @protocol_action
     async def turn_on_led(self, led_identifier: int) -> None:
         """
         """
@@ -220,6 +229,7 @@ class DroidAudioController(object):
         if not led_identifier in self.turned_on_leds:
             self.turned_on_leds.append(led_identifier)
 
+    @protocol_action
     async def turn_off_led(self, led_identifier: int) -> None:
         """
         """

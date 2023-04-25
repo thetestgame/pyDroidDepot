@@ -6,7 +6,7 @@ The classes contained in this module are licensed under the MIT License.
 
 from enum import IntEnum
 from droiddepot.utils import int_to_hex
-from droiddepot.protocol import DroidCommandId, DroidMultipurposeCommand
+from droiddepot.protocol import DroidCommandId, DroidMultipurposeCommand, protocol_action
 
 class DroidMotorDirection(object):
     """
@@ -77,6 +77,7 @@ class DroidMotorController(object):
         for handler in self.__motor_event_handlers:
             handler(DroidMotorEvent(event_id))
     
+    @protocol_action
     async def send_motor_speed_command(self, direction: int, motor_id: int, speed: int = 160, ramp_speed: int = 300, delay = 0) -> None:
         """
         Sends a motor speed command to the droid.
@@ -98,6 +99,7 @@ class DroidMotorController(object):
         motor_command = "%s%s%s%s" % (motor_select, int_to_hex(speed), int_to_hex(ramp_speed), delay_hex)
         await self.droid.send_droid_command(DroidCommandId.SetMotorSpeed, motor_command)
 
+    @protocol_action
     async def set_movement_speed(self, direction: int, speed: int = 100, ramp_speed: int = 300) -> None:
         """
         Sends a motor speed command to the droid to both the left and right movement motors.
@@ -111,6 +113,7 @@ class DroidMotorController(object):
         await self.send_motor_speed_command(direction, DroidMotorIdentifier.LeftMotor, speed, ramp_speed)
         await self.send_motor_speed_command(direction, DroidMotorIdentifier.RightMotor, speed, ramp_speed)
 
+    @protocol_action
     async def rotate_head(self, direction: int, speed: int = 160, ramp_speed: int = 300) -> None:
         """
         Rotates the head of the droid.
@@ -126,6 +129,7 @@ class DroidMotorController(object):
         
         await self.send_motor_speed_command(direction, DroidMotorIdentifier.HeadMotor, speed, ramp_speed)
 
+    @protocol_action
     async def stop_head(self) -> None:
         """
         Stops the rotation of the head.
@@ -133,6 +137,7 @@ class DroidMotorController(object):
 
         await self.rotate_head(DroidMotorDirection.Left, 0)
 
+    @protocol_action
     async def center_head(self, speed: int = 255, offset: int  = 0) -> None:
         """
         Centers the head of the droid.
@@ -144,17 +149,3 @@ class DroidMotorController(object):
 
         command_data = "%s%s" % (int_to_hex(speed), int_to_hex(offset))
         await self.droid.send_droid_multi_command(DroidMultipurposeCommand.CenterRUnitHead, command_data)
-
-    #02
-    #03
-    #82
-    #02
-    #84 
-    #82
-
-    #02
-    #04
-    #82
-    #02
-    #83
-    #82

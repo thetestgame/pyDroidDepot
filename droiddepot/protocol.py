@@ -4,6 +4,7 @@ define the constant command identifiers to communicate with a SWGE droid.
 """
 
 from enum import IntEnum
+import inspect
 
 class DisneyBLEManufacturerId(object):
     """
@@ -87,3 +88,27 @@ class DroidAffiliation(object):
     Scoundrel = 1
     Resistenace = 5
     FirstOrder = 9
+
+def protocol_action(func: object) -> object:
+    """
+    Decorator for marking a function as a "protocol" based action. Generally
+    used to indicate a method performs a bluetooth command to the connected droid.
+    """
+
+    async def async_wrapper(*args, **kwargs) -> object:
+        """
+        Async wrapper function used for applying custom metadata
+        """
+
+        return await func(*args, **kwargs)
+    
+    def wrapper(*args, **kwargs) -> object:
+        """
+        Wrapper function used for applying custom metadata
+        """
+
+    wrapped = async_wrapper if inspect.iscoroutinefunction(func) else wrapper
+    wrapped.__doc__ == func.__doc__
+    wrapped.is_protocol_action = True
+
+    return wrapped

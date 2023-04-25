@@ -181,6 +181,7 @@ class DroidConnection(object):
         
         return command_bytes
 
+    @protocol_action
     async def send_droid_command(self, command_id: int, data: str = "") -> None:
         """
         Sends a command to the Droid, composed of a command ID and optional data.
@@ -196,6 +197,7 @@ class DroidConnection(object):
         logging.debug('Sending command: %s' % command.hex())
         await self.droid.write_gatt_char(DroidBluetoothCharacteristics.DroidCommandCharacteristic, bytearray.fromhex(command.hex()))
 
+    @protocol_action
     async def send_droid_multi_command(self, command_id: int, data: str = "") -> None:
         """
         Sends a multi command to the Droid, composed of a command ID and optional data.
@@ -210,6 +212,7 @@ class DroidConnection(object):
         command = "44%s%s" % ("{:02d}".format(command_id), data)
         await self.send_droid_command(DroidCommandId.MultipurposeCommand, command)
 
+    @protocol_action
     async def get_droid_firmware_information(self) -> None:
         """
         Requests the droid firmware information. Currently the contents of this data
@@ -223,6 +226,7 @@ class DroidConnection(object):
             raise Exception('Failed to retrieve firmware information. No response given')
         return firemware_information
 
+    @protocol_action
     async def set_pairing_led(self, state: bool) -> None:
         """
         Sets the active state of the droid's pairing led.
@@ -235,6 +239,7 @@ class DroidConnection(object):
         data += "ff" if state else "00"
         await self.send_droid_command(DroidCommandId.SetPairingLedState, data)
 
+    @protocol_action
     async def set_rgb_led(self, state: bool) -> None:
         """
         Sets the active state of the droid's onboard RGB led. Currently no droids exist that use this feature
@@ -248,6 +253,7 @@ class DroidConnection(object):
         data += "ff" if state else "00"
         await self.send_droid_command(DroidCommandId.SetRGBLedState, data)
 
+    @protocol_action
     async def flash_pairing_led(self, data: str) -> None:
         """
         Flashes the droids onboard pairing led. Currently the data required for this command has not been decoded. 
