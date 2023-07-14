@@ -144,17 +144,3 @@ class DroidMotorController(object):
 
         command_data = "%s%s" % (int_to_hex(speed), int_to_hex(offset))
         await self.droid.send_droid_multi_command(DroidMultipurposeCommand.CenterRUnitHead, command_data)
-
-    #02
-    #03
-    #82
-    #02
-    #84 
-    #82
-
-    #02
-    #04
-    #82
-    #02
-    #83
-    #82
