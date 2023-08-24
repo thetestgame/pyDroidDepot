@@ -12,7 +12,7 @@ setup(
     description="Module for controlling droids built and purchased at the Droid Depot in Disney's Galaxys Edge",
     long_description=long_description,
     license='MIT',
-    version='1.0.1',
+    version='1.0.2',
     author='Jordan Maxwell',
     maintainer='Jordan Maxwell',
     url='https://github.com/thetestgame/pyDroidDepot',
