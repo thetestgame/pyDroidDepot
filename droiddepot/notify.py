@@ -1,12 +1,13 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 This module provides classes for processing and handling notifications from a connected droid. 
 
 It contains the DroidNotifyMessage class, which represents a notification message from the droid, and 
 the DroidNotificationProcessor class, which handles incoming notifications from the droid and passes 
 them to the appropriate handlers. The DroidNotificationProcessor class also includes methods for decoding 
 incoming messages and verifying firmware versions.
-
-This class is licensed under MIT.
 """
 
 import logging

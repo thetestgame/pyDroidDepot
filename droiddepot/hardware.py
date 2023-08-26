@@ -1,7 +1,8 @@
 """
-This modules defines classes and helper functions for working with SWGE droid hardware. 
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
 
-This code is MIT licensed.
+This modules defines classes and helper functions for working with SWGE droid hardware. 
 """
 
 DroidFirmwareVersion = '4b1001444411110100000000'

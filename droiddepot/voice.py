@@ -1,4 +1,7 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 This module provides a voice controller for SWGE droids that attempts to match the droid's configured affiliation
 to a tone of voice based on the available audio banks in the droid's memory. 
 
@@ -8,8 +11,6 @@ voice based on the droid's affiliation.
 The `DroidVoiceTone` class defines identifiers for the possible tones of voice to use when speaking. 
 The `talk_with_animation` method of the `DroidVoiceController` class sends a command to the droid to speak with a random animation and audio file
 based around the tone supplied when invoked.
-
-This code is MIT licensed.
 """
 
 from droiddepot.hardware import DroidAffiliation, DroidAudioBankIdentifier

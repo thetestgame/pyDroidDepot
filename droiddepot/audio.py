@@ -1,10 +1,11 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 This module defines classes for controlling audio and LEDs for a droid. It contains three classes:
 1. DroidAudioCommand: A collection of audio commands for a droid
 2. DroidLedIdentifier: A collection of LED identifiers for a droid
 3. DroidAudioController: Represents an audio controller for a Droid and has methods for controlling audio and LEDs
-
-This code is MIT licensed.
 """
 
 from enum import IntEnum

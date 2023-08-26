@@ -1,4 +1,7 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 This module defines the DroidCommandId and DroidMultipurposeCommand classes used to 
 define the constant command identifiers to communicate with a SWGE droid.
 """

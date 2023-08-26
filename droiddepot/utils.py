@@ -1,7 +1,8 @@
 """
-Utility methods module for PyDroidDepot. 
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
 
-This code is MIT licensed.
+Utility methods module for PyDroidDepot. 
 """
 
 def int_to_hex(num: int) -> str:

@@ -1,11 +1,12 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 DroidConnection is a BLE class representing a connection to a SWGE DroidDepot droid. 
 It includes methods for connecting, disconnecting, sending commands, and running scripts on the droid.
 
 It also includes instances of DroidAudioController, DroidMotorController, and DroidScriptEngine 
 to manage the droid's audio, motor, and script functions.
-
-This class is licensed under MIT.
 """
 
 import asyncio

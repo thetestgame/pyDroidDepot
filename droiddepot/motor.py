@@ -1,7 +1,8 @@
 """
-This module provides classes for controlling the motor functions of a SWGE DroidDepot droid.
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
 
-The classes contained in this module are licensed under the MIT License.
+This module provides classes for controlling the motor functions of a SWGE DroidDepot droid.
 """
 
 from enum import IntEnum

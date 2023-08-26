@@ -1,18 +1,19 @@
 """
+Copyright (c) Jordan Maxwell, All Rights Reserved.
+See LICENSE file in the project root for full license information.
+
 This module contains classes and functions for interacting with droid scripts.
 
 1. DroidScripts: An enumeration containing constants representing available droid scripts.
 2. DroidScriptActions: An enumeration containing constants representing available droid script actions.
 3. DroidScriptEngine: A class that represents the droid script engine and provides methods for executing droid scripts.
-
-This code is MIT licensed.
 """
 
 import asyncio
 import logging
 from datetime import datetime
+from dbeacon import scanner, beacon
 from droiddepot.protocol import DroidCommandId
-from droiddepot.beacon import DroidReactionBeaconScanner, decode_location_beacon_payload
 
 class DroidScripts(object):
     """
@@ -22,7 +23,7 @@ class DroidScripts(object):
     GeneralParkResponseScript = 1
     DroidDepotParkResponseScript = 2
     ResistenceParkResponseScript = 3
-    UnknownParkResponseScript = 4
+    UnknownParkResponseScript = 4 # Possibly related to smuggers run?
     OgasCantinaParkResponseScript = 5
     DokOndarsParkResponseScript = 6
     FirstOrderParkResponseScript = 7
@@ -58,8 +59,8 @@ class DroidScriptEngine(object):
         self.droid = droid
 
         self.__location_reaction_tracker = {}
-        self.reaction_scanner = DroidReactionBeaconScanner()
-        self.reaction_scanner.add_location_handler(self.__perform_droid_location_reactions)
+        self.reaction_scanner = scanner.DBeaconScanner()
+        self.reaction_scanner.add_beacon_handler(10, self.__perform_location_reactions)
 
     async def send_script_command(self, script_id: int, script_action: int) -> None:
         """
@@ -93,17 +94,29 @@ class DroidScriptEngine(object):
 
         await self.send_script_command(script_id, DroidScriptActions.ExecuteScript)
 
-    async def execute_location_beacon_payload(self, payload: str) -> None:
+    async def execute_location_beacon(self, beacon: beacon.LocationBeacon) -> None:
         """
         Executes a location beacon on the connected droid emulation what would happen
         if the droid encountered the beacon at a Disney park
 
         Args:
-            payload (str): Payload advertised by a park beacon
+            beacon (LocationBeacon): Location beacon to execute
         """
 
-        data = decode_location_beacon_payload(payload)
-        await self.execute_script(data['script_id'])
+        await self.execute_script(beacon.location_id)
+
+    async def execute_location_reaction(self, location_id: int) -> None:
+        """
+        Executes a location reaction on the connected droid emulation what would happen
+        
+        Args:
+            location_id (int): Location id to execute
+        """
+
+        if location_id < 0 or location_id > 7:
+            raise ValueError("Invalid location id requested. Location ids must be between 0 and 7")
+        
+        await self.execute_script(location_id)
 
     async def open_script(self, script_id: int) -> None:
         """
@@ -147,40 +160,40 @@ class DroidScriptEngine(object):
 
         return interval
 
-    async def __perform_droid_location_reactions(self, locations: list) -> None:
+    async def __perform_location_reactions(self, beacons: list) -> None:
         """
         Executes a script associated with each park location beacon that the droid enters.
 
         Args:
-            locations (list): A list of location beacon addresses to react to
+            locations (list): A list of beacons detected
 
         Returns:
             int: The calculated reaction time in seconds.
         """
 
         # Verify we have at least one location to react to first.
-        if len(locations) == 0:
+        if len(beacons) == 0:
             return
         
         can_execute = True
         already_executed = False
-        for location_beacon_address in locations:
+        location_beacon_address = "Unknown"
+
+        for location_beacon_info in beacons:
             try:
-                location_data = locations[location_beacon_address]
+                location_beacon_address, location_beacon = location_beacon_info
 
                 # Check if we already reacted and if we have check if we are in a new reaction window
                 if location_beacon_address in self.__location_reaction_tracker:
                     last_execution = self.__location_reaction_tracker[location_beacon_address]
                     time_since_last = (datetime.now() - last_execution).total_seconds()
-                    can_execute = time_since_last >= self.__calculate_reaction_time(location_data['reaction_interval'])
+                    can_execute = time_since_last >= self.__calculate_reaction_time(location_beacon.reaction_interval)
 
                 # Attempt to execute the reaction
                 if can_execute and already_executed == False:
-                    await self.execute_script(location_data['script_id'])
+                    await self.execute_location_reaction(location_beacon.location_id)
                     self.__location_reaction_tracker[location_beacon_address] = datetime.now()
                     already_executed = True
-            except ValueError:
-                logging.error('Failed to handle location beacon execution. Likely attempted to execute a dangerous script')
             except Exception as e:
                 logging.error('An unexpected error occured processing a park location beacon: %s' % location_beacon_address)
                 logging.error(e, exc_info=True) 
