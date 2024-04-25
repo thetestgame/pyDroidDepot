@@ -273,11 +273,9 @@ async def discover_droids(retry: bool = False) -> list:
     """
 
     async with BleakScanner() as scanner:      
-        await scanner.start()
-
         droid_connections = []
-
         droids = []
+        
         while True:
             possible_droids = scanner.discovered_devices_and_advertisement_data
             if len(possible_droids) == 0:
