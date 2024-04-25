@@ -4,6 +4,14 @@
 
 PyDroidDepot is an open-source project that aims to provide Python access to the Starwars Galaxy's Edge droid depot droids. It allows users to manually control their custom built droids using custom applications.
 
+# Supported Droid Types
+
+* R Units 
+* B Unit (WIP)
+* BD Unit (WIP)
+
+Droids types that are marked as work in progress will function though they may have unexpected behaviour or may be missing functionality.
+
 ## Installation
 
 PyDroidDepot can be installed using `pip`, or by downloading the source code and running the `setup.py` script.
