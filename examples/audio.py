@@ -27,21 +27,21 @@ async def main() -> None:
     Main entry point into the example application
     """
 
-    d = await discover_droid(retry=True)
+    droid = await discover_droid(retry=True)
     try:
-        await d.connect()
-        await d.audio_controller.set_volume(20)
+        async with droid as d:
+            await d.audio_controller.set_volume(20)
 
-        current_audio_index = 1
-        while d.droid.is_connected:
-            print("Playing sound id %s from bank 1" % current_audio_index)
-            await d.audio_controller.play_audio(current_audio_index, 1, True)
-            
-            sleep(randrange(10, 30))
-            current_audio_index += 1
-            if current_audio_index > 5:
-                current_audio_index = 1
-            
+            current_audio_index = 1
+            while d.droid.is_connected:
+                print("Playing sound id %s from bank 1" % current_audio_index)
+                await d.audio_controller.play_audio(current_audio_index, 1, True)
+                
+                sleep(randrange(10, 30))
+                current_audio_index += 1
+                if current_audio_index > 5:
+                    current_audio_index = 1
+          
     except OSError as err:
         print(f"Discovery failed due to operating system: {err}")
     except BleakError as err:
@@ -50,7 +50,6 @@ async def main() -> None:
         pass
     finally:
         print("Shutting down.")
-        await d.disconnect()
 
 # Main entry point into the example application
 if __name__ == "__main__":

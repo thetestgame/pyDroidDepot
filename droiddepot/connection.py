@@ -99,6 +99,22 @@ class DroidConnection(object):
         self.heartbeat_thread.start()
         asyncio.run_coroutine_threadsafe(self.__send_heartbeat_command(), self.heartbeat_loop)
 
+    def __enter__(self) -> object:
+        """
+        Connect to the droid when the connection is opened.
+        """
+
+        asyncio.run(self.connect())
+        return self
+    
+    async def __aenter__(self) -> object:
+        """
+        Connect to the droid when the connection is opened.
+        """
+
+        await self.connect()
+        return self
+
     async def notification_handler(self, sender: object, data: bytearray) -> None:
         """
         Processes notification events from the connected droid and
@@ -141,6 +157,20 @@ class DroidConnection(object):
 
             if self.heartbeat_loop != None:
                 self.heartbeat_loop.stop()
+
+    def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+        """
+        Disconnects from the Droid when the connection is closed.
+        """
+
+        asyncio.run(self.disconnect())
+
+    def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+        """
+        Disconnects from the Droid when the connection is closed.
+        """
+
+        self.disconnect()
 
     def build_droid_command(self, command_id: int, data: str) -> bytearray:
         """

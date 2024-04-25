@@ -16,14 +16,14 @@ async def main() -> None:
     Main entry point into the example application
     """
 
-    d = await discover_droid(retry=True)
+    droid = await discover_droid(retry=True)
     try:
-        await d.connect(silent=True)
-        await d.audio_controller.set_volume(20)
-        d.script_engine.start_beacon_reactions()
+        async with droid as d:
+            await d.audio_controller.set_volume(20)
+            d.script_engine.start_beacon_reactions()
 
-        while d.droid.is_connected:
-            sleep(1)
+            while d.droid.is_connected:
+                sleep(1)
             
     except OSError as err:
         print(f"Discovery failed due to operating system: {err}")
@@ -33,7 +33,6 @@ async def main() -> None:
         pass
     finally:
         print("Shutting down.")
-        await d.disconnect()
 
 # Main entry point into the example application
 if __name__ == "__main__":
