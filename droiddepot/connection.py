@@ -141,7 +141,7 @@ class DroidConnection(object):
             return
         
         # Perform shutdown operations
-        await self.motor_controller.rotate_head(0, 0)
+        await self.motor_controller.set_head_speed(0, 0)
         await self.motor_controller.set_drive_speed(0, 0)
 
         logging.info("Disconnecting from droiddepot")
