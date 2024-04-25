@@ -236,17 +236,17 @@ class DroidScriptProgrammer(object):
 
         await self.send_script_command(self.script_id, DroidScriptActions.CloseScript)
 
-    def __aenter__(self) -> object:
+    async def __aenter__(self) -> object:
         """
         Opens the script for writing.
         """
 
-        self.open_script(self.script_id)
+        await self.open_script(self.script_id)
         return self
     
-    def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+    async def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
         """
         Closes the script.
         """
 
-        self.close_script(self.script_id)
+        await self.close_script(self.script_id)
