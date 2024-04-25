@@ -94,6 +94,17 @@ class DroidScriptEngine(object):
 
         await self.send_script_command(script_id, DroidScriptActions.ExecuteScript)
 
+    async def open_script(self, script_id: int) -> object:
+        """
+        Opens a droid script for writing and returns a DroidScriptProgrammer instance
+        to allow for editing the script.
+
+        Args:
+            script_id (int): The ID of the script to open for writing.
+        """
+
+        return DroidScriptProgrammer(self.droid, script_id)
+
     async def execute_location_beacon(self, beacon: beacon.LocationBeacon) -> None:
         """
         Executes a location beacon on the connected droid emulation what would happen
@@ -117,34 +128,6 @@ class DroidScriptEngine(object):
             raise ValueError("Invalid location id requested. Location ids must be between 0 and 7")
         
         await self.execute_script(location_id)
-
-    async def open_script(self, script_id: int) -> None:
-        """
-        Opens a droid script for writing. All command sent after the script is opened will be
-        written into the script id until close_script is called
-
-        Args:
-            script_id (int): The ID of the script to open for writing.
-        """
-
-        if script_id <= 0:
-            raise ValueError('Script ids must be larger then 0')
-
-        if script_id >= 1 and script_id <= 13:
-            raise ValueError("Attempted to rewrite Disney programmed scripts. Action prevented for safety")
-
-        await self.send_script_command(script_id, DroidScriptActions.OpenScript)
-
-    async def close_script(self, script_id: int = 0) -> None:
-        """
-        Closes the currently open script. This will also stop any script currently
-        being executed.
-
-        Args:
-            script_id (int): The ID of the script to close.
-        """
-
-        await self.send_script_command(script_id, DroidScriptActions.CloseScript)
 
     def __calculate_reaction_time(self, interval: int) -> int:
         """
@@ -214,3 +197,56 @@ class DroidScriptEngine(object):
         """
 
         self.reaction_scanner.stop()
+
+class DroidScriptProgrammer(object):
+    """
+    A class that represents a droid script programmer and provides methods for creating and editing droid scripts.
+    """
+
+    def __init__(self, droid: object, script_id: int) -> None:
+        """
+        Initializes a new instance of the DroidScriptProgrammer class.
+        
+        Args:
+            droid (object): The droid instance to use.
+            script_id (int): The ID of the script to open for writing.
+        """
+
+        self.droid = droid
+        self.script_id = script_id
+
+        if script_id <= 0:
+            raise ValueError('Script ids must be larger then 0')
+
+        if script_id >= 1 and script_id <= 13:
+            raise ValueError("Attempted to rewrite Disney programmed scripts. Action prevented for safety")
+
+    async def open_script(self) -> None:
+        """
+        Opens the script for writing.
+        """
+
+        await self.send_script_command(self.script_id, DroidScriptActions.OpenScript)
+
+    async def close_script(self, script_id: int = 0) -> None:
+        """
+        Closes the opened script. This will also stop any script currently
+        being executed.
+        """
+
+        await self.send_script_command(self.script_id, DroidScriptActions.CloseScript)
+
+    def __aenter__(self) -> object:
+        """
+        Opens the script for writing.
+        """
+
+        self.open_script(self.script_id)
+        return self
+    
+    def __aexit__(self, exc_type, exc_value, traceback) -> None:
+        """
+        Closes the script.
+        """
+
+        self.close_script(self.script_id)
