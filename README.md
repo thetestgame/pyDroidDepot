@@ -43,4 +43,5 @@ python setup.py install
 PyDroidDepot comes with a few examples to help users get started. These examples can be found under the `examples` directory in the repository root.
 
 ## License
+
 PyDroidDepot is released under the MIT license. See the LICENSE file for more details.
