@@ -244,7 +244,7 @@ class DroidScriptProgrammer(object):
         self.open_script(self.script_id)
         return self
     
-    def __aexit__(self, exc_type, exc_value, traceback) -> None:
+    def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
         """
         Closes the script.
         """

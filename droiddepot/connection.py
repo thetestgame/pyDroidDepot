@@ -99,14 +99,6 @@ class DroidConnection(object):
         self.heartbeat_thread.start()
         asyncio.run_coroutine_threadsafe(self.__send_heartbeat_command(), self.heartbeat_loop)
 
-    def __enter__(self) -> object:
-        """
-        Connect to the droid when the connection is opened.
-        """
-
-        asyncio.run(self.connect())
-        return self
-    
     async def __aenter__(self) -> object:
         """
         Connect to the droid when the connection is opened.
@@ -147,6 +139,10 @@ class DroidConnection(object):
 
         if not self.droid.is_connected:
             return
+        
+        # Perform shutdown operations
+        await self.motor_controller.rotate_head(0, 0)
+        await self.motor_controller.set_drive_speed(0, 0)
 
         logging.info("Disconnecting from droiddepot")
         try:
@@ -158,19 +154,12 @@ class DroidConnection(object):
             if self.heartbeat_loop != None:
                 self.heartbeat_loop.stop()
 
-    def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+    async def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
         """
         Disconnects from the Droid when the connection is closed.
         """
 
-        asyncio.run(self.disconnect())
-
-    def __aexit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
-        """
-        Disconnects from the Droid when the connection is closed.
-        """
-
-        self.disconnect()
+        await self.disconnect()
 
     def build_droid_command(self, command_id: int, data: str) -> bytearray:
         """

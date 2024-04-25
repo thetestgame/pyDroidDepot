@@ -52,9 +52,9 @@ def get_service_command_args(input_list: list) -> list:
 
 async def main() -> None:
     droid = await discover_droid(retry=True)
-    head_leds = [DroidLedIdentifier.RUnitLeftHeadLed, DroidLedIdentifier.RUnitMiddleHeadLed, DroidLedIdentifier.RUnitRightHeadLed]
-    try:
-        async with droid as d:
+
+    async with droid as d:
+        try:
             await d.motor_controller.center_head()
 
             while d.droid.is_connected:            
@@ -86,14 +86,14 @@ async def main() -> None:
                 except SyntaxError as err:
                     print('Invalid arguments. Check your inputs')
         
-    except OSError as err:
-        print(f"Discovery failed due to operating system: {err}")
-    except BleakError as err:
-        print(f"Discovery failed due to Bleak: {err}")
-    except KeyboardInterrupt as err:
-        pass
-    finally:
-        print("\nShutting down.")
+        except OSError as err:
+            print(f"Discovery failed due to operating system: {err}")
+        except BleakError as err:
+            print(f"Discovery failed due to Bleak: {err}")
+        except KeyboardInterrupt as err:
+            pass
+        finally:
+            print("\nShutting down.")
 
 if __name__ == "__main__":
     asyncio.run(main())
