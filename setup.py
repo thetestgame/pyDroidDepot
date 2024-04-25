@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='MIT',
-    version='1.0.3',
+    version='1.1.0',
     author='Jordan Maxwell',
     maintainer='Jordan Maxwell',
     url='https://github.com/thetestgame/pyDroidDepot',
