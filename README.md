@@ -7,11 +7,11 @@ PyDroidDepot is an open-source project that aims to provide Python access to the
 # Supported Droid Types
 
 * R Unit
-* C1 Unit
+* C Unit
 * B Unit (WIP)
 * BD Unit (WIP)
 
-Droids types that are marked as work in progress will function though they may have unexpected behaviour or may be missing functionality.
+Droid types that are marked as work in progress will function though they may have unexpected behaviour or may be missing functionality.
 
 ## Installation
 
