@@ -20,4 +20,9 @@ setup(
     packages=['droiddepot'],
     classifiers=[
         'Programming Language :: Python :: 3',
-    ])
+    ],
+    install_requires=[
+        'bleak==0.20.2',
+        'pydBeacon==1.0.0',
+    ]
+)
