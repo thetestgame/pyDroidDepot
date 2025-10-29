@@ -10,6 +10,7 @@ to manage the droid's audio, motor, and script functions.
 """
 
 import asyncio
+from contextlib import AbstractAsyncContextManager
 import logging
 from time import sleep
 from threading import Thread
@@ -22,7 +23,7 @@ from droiddepot.voice import DroidVoiceController
 from droiddepot.notify import DroidNotificationProcessor
 from droiddepot.hardware import DroidPersonalityIdentifier, DroidAffiliation
 
-class DroidConnection(object):
+class DroidConnection(AbstractAsyncContextManager):
     """
     Represents a connection to a SWGE DroidDepot droid.
 
